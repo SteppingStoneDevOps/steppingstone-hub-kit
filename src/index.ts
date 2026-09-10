@@ -1,6 +1,10 @@
-// @steppingstone/hub-kit — shared design-system primitives for the SteppingStone hubs.
+// @steppingstone/hub-kit — shared design-system primitives + foundations for the SteppingStone hubs.
 // Single source of truth; consumed by advisor-hub + admin-hub via transpilePackages + @source.
 export * from "./cn";
+export * from "./services";
+export * from "./ThemeProvider";
+export * from "./AppearanceCard";
+export * from "./Logo";
 export * from "./Badge";
 export * from "./Button";
 export * from "./Card";
