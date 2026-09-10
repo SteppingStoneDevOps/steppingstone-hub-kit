@@ -27,6 +27,7 @@ export function DataTable<T>({
   rows,
   getRowKey,
   onRowClick,
+  rowClassName,
   search,
   toolbarRight,
   pageSize = 8,
@@ -36,6 +37,8 @@ export function DataTable<T>({
   rows: T[];
   getRowKey: (row: T) => string;
   onRowClick?: (row: T) => void;
+  /** Extra classes per row — e.g. to de-emphasize a deactivated member. */
+  rowClassName?: (row: T) => string;
   /** enable a search box; returns true if row matches the query */
   search?: { placeholder?: string; match: (row: T, q: string) => boolean };
   toolbarRight?: React.ReactNode;
@@ -142,6 +145,7 @@ export function DataTable<T>({
                   className={cn(
                     "border-b border-border-soft/60 last:border-0 transition-colors",
                     onRowClick && "cursor-pointer hover:bg-hover",
+                    rowClassName?.(row),
                   )}
                 >
                   {columns.map((c) => (
