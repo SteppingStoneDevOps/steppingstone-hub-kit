@@ -2,6 +2,7 @@
 // Single source of truth; consumed by advisor-hub + admin-hub via transpilePackages + @source.
 export * from "./cn";
 export * from "./services";
+export * from "./departments";
 export * from "./ThemeProvider";
 export * from "./AppearanceCard";
 export * from "./Logo";
@@ -15,5 +16,6 @@ export * from "./ErrorState";
 export * from "./IconButton";
 export * from "./InfoHint";
 export * from "./Modal";
+export * from "./PhoneInput";
 export * from "./Skeleton";
 export * from "./form";
