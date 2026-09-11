@@ -46,7 +46,7 @@ function personalizeInsight(text: string, name: string) {
     .replace(/^This\s+student\b/i, first);
 }
 
-export function StudentDetailView({ student, askStella, generateOutreachDrafts }: { student: StudentDetail; askStella: AskStellaFn; generateOutreachDrafts: GenerateOutreachFn }) {
+export function StudentDetailView({ student, askStella, generateOutreachDrafts, basePath }: { student: StudentDetail; askStella: AskStellaFn; generateOutreachDrafts: GenerateOutreachFn; basePath: string }) {
   const name = student.display_name ?? student.student_guid;
   const firstName = name.split(/\s+/)[0];
   const yr = student.year_in_program;
@@ -60,7 +60,7 @@ export function StudentDetailView({ student, askStella, generateOutreachDrafts }
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-6">
-      <Link href={`/advisor/crs/cohort/${yr}/students`} className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted hover:text-fg">
+      <Link href={`${basePath}/cohort/${yr}/students`} className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted hover:text-fg">
         <ArrowLeft className="size-4" /> Back
       </Link>
 

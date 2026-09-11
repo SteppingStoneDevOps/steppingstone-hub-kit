@@ -41,11 +41,14 @@ export function StudentListView({
   year,
   status,
   generateOutreachDrafts,
+  basePath,
 }: {
   students: StudentSummary[];
   year: number;
   status: Status;
   generateOutreachDrafts: GenerateOutreachFn;
+  /** Route prefix for nav links — route-agnostic so both hubs reuse this view. */
+  basePath: string;
 }) {
   const router = useRouter();
   const [nameQuery, setNameQuery] = useState("");
@@ -81,7 +84,7 @@ export function StudentListView({
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-6">
-      <Link href={`/advisor/crs/cohort/${year}`} className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted hover:text-fg">
+      <Link href={`${basePath}/cohort/${year}`} className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted hover:text-fg">
         <ArrowLeft className="size-4" /> Back
       </Link>
 
@@ -97,7 +100,7 @@ export function StudentListView({
           return (
             <Link
               key={s}
-              href={`/advisor/crs/cohort/${year}/students?status=${encodeURIComponent(s)}`}
+              href={`${basePath}/cohort/${year}/students?status=${encodeURIComponent(s)}`}
               className={`rounded-full border px-3 py-1 text-sm transition-colors ${
                 active ? STATUS_CLS[s] + " font-medium" : "border-border bg-chip text-muted hover:text-fg"
               }`}
@@ -171,13 +174,13 @@ export function StudentListView({
               return (
                 <tr
                   key={s.student_guid}
-                  onClick={() => router.push(`/advisor/crs/student/${s.student_guid}`)}
+                  onClick={() => router.push(`${basePath}/student/${s.student_guid}`)}
                   className="cursor-pointer transition-colors hover:bg-hover"
                 >
                   <td className="px-4 py-2.5">
                     {/* Whole row navigates; the name stays a Link for keyboard access. */}
                     <Link
-                      href={`/advisor/crs/student/${s.student_guid}`}
+                      href={`${basePath}/student/${s.student_guid}`}
                       onClick={(e) => e.stopPropagation()}
                       className="flex items-center gap-2.5 font-medium text-fg hover:text-indigo"
                     >

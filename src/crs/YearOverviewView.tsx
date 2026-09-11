@@ -15,7 +15,7 @@ const STATUS_ROWS: { status: Status; cls: string; bar: string; desc: (stage: str
   { status: "High Priority", cls: "text-red", bar: "bg-red", desc: () => "Key milestones unmet — needs immediate outreach." },
 ];
 
-export function YearOverviewView({ cohort }: { cohort: CohortSummary }) {
+export function YearOverviewView({ cohort, basePath }: { cohort: CohortSummary; basePath: string }) {
   const stage = stageLabel(cohort.year);
   const cell = (s: Status) =>
     s === "On Track"
@@ -26,7 +26,7 @@ export function YearOverviewView({ cohort }: { cohort: CohortSummary }) {
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-6">
-      <Link href="/advisor/crs" className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted hover:text-fg">
+      <Link href={basePath} className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted hover:text-fg">
         <ArrowLeft className="size-4" /> Back
       </Link>
 
@@ -46,7 +46,7 @@ export function YearOverviewView({ cohort }: { cohort: CohortSummary }) {
             return (
               <Link
                 key={row.status}
-                href={`/advisor/crs/cohort/${cohort.year}/students?status=${encodeURIComponent(row.status)}`}
+                href={`${basePath}/cohort/${cohort.year}/students?status=${encodeURIComponent(row.status)}`}
                 className="flex items-center gap-4 rounded-lg border border-border bg-panel-2 px-4 py-3 transition-colors hover:bg-hover"
               >
                 <div className={`h-10 w-1 shrink-0 rounded-full ${row.bar}`} />

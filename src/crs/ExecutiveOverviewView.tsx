@@ -18,12 +18,16 @@ export function ExecutiveOverviewView({
   overview,
   insight,
   institutionName,
+  basePath,
 }: {
   overview: InstitutionOverview;
   /** The Stella institution insight, streamed in after the overview (a Suspense boundary). */
   insight: ReactNode;
   /** WIRE: Lynn — resolved from the session/CRS (org name); omitted until then. */
   institutionName?: string;
+  /** Route prefix for drill-down links — "/advisor/crs" (advisor hub) or
+   *  "/admin/universities/{id}/crs" (admin hub). Keeps the shared view route-agnostic. */
+  basePath: string;
 }) {
   const { working, concerns } = overview;
   const generatedDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
@@ -77,7 +81,7 @@ export function ExecutiveOverviewView({
             return (
               <Link
                 key={c.year}
-                href={`/advisor/crs/cohort/${c.year}`}
+                href={`${basePath}/cohort/${c.year}`}
                 className="flex items-center gap-4 rounded-lg border border-border bg-panel-2 px-4 py-2.5 transition-colors hover:bg-hover"
               >
                 <div className="w-24 shrink-0">
