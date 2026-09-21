@@ -42,7 +42,12 @@ export interface CohortSummary {
 
 /**
  * A "What's Working / Areas of Concern" point. `what` (fact) + `soWhat` (significance) are
- * rule-derived by the service; `recommendation` is the optional Stella "Now What" for that point.
+ * rule-derived by the service; `recommendation` is the optional generated "Now What" for that
+ * point.
+ *
+ * ⚠ The recommendation is AI-authored but UNATTRIBUTED (Eric, 2026-09-17) — block 3A is explicitly
+ * "not labeled as Stella", unlike the Stella's Reading panel beside it on the same screen. It used
+ * to be described here as Stella's; it is not.
  */
 export interface NarrativePoint {
   what: string;

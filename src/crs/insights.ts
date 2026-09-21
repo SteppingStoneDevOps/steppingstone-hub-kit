@@ -3,7 +3,11 @@ import type { InstitutionOverview, CohortSummary } from "./types";
 /**
  * CRS rules layer — the deterministic "What" + "So What" for the Executive Overview narrative.
  * Per the 2026-08-23 decision, facts and their significance are RULE-DERIVED (never AI-authored);
- * only the "Now What" recommendation is Stella/AI. This module is that rule layer.
+ * only the "Now What" recommendation is generated. This module is that rule layer.
+ *
+ * ⚠ Two generated things sit on that screen and they are labelled differently (Eric, 2026-09-17):
+ * the per-point recommendation (block 3A) is UNATTRIBUTED, while the Stella's Reading panel beside
+ * it is attributed. This comment used to call the recommendation Stella's; it is not.
  */
 
 /**

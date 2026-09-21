@@ -10,6 +10,17 @@ import type { StudentSummary, Status, GenerateOutreachFn } from "./types";
  * [First Name] merge. Export CSV is live; platform Send is a Coming-Soon stub (auth-gated later).
  */
 type OType = "personalized" | "broadcast";
+
+/**
+ * The server's bound on `POST /crs/outreach`, mirrored here so the UI can respect it rather than
+ * discover it as a 422. `DraftOutreachRequest.student_ids` is `max_length=50`, because each student
+ * is a separate model call and an unbounded list is an unbounded bill.
+ *
+ * ⚠ PERSONALIZED ONLY. Broadcast never calls the model — it is one template with a [First Name]
+ * merge — so capping the SELECTION would wrongly limit a mode that costs nothing. The cap belongs
+ * on the mode that spends, not on the list.
+ */
+const PERSONALIZED_MAX = 50;
 const YEAR_ORDINAL: Record<number, string> = { 1: "1st Year", 2: "2nd Year", 3: "3rd Year", 4: "4th Year" };
 const STATUS_CLS: Record<Status, string> = {
   "On Track": "text-green border-green/40 bg-green/12",
@@ -43,6 +54,21 @@ function initials(name: string) {
   const p = name.trim().split(/\s+/);
   return (p.length >= 2 ? p[0][0] + p[1][0] : name.slice(0, 2)).toUpperCase();
 }
+/**
+ * Resolve the [First Name] token. Broadcast has always needed this — its template carries the
+ * token by design. PERSONALIZED NEEDS IT TOO, which is easy to miss: the drafting service is
+ * guid-only and holds no names (they are joined on by the headless router AFTER the drafts come
+ * back), so block 5 is instructed to fall back to the literal token when no first name reaches it.
+ * Until a name does, every personalized draft contains one — and before this, the personalized
+ * export path did no substitution at all, so advisors got "Hi [First Name]," in the CSV while the
+ * review card above it showed the student's real name.
+ *
+ * Harmless once names travel: a draft with no token is returned unchanged.
+ */
+function mergeFirstName(text: string, first: string) {
+  return text.replace(/\[First Name\]/g, first);
+}
+
 function csvCell(v: string) {
   const t = String(v ?? "");
   return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
@@ -89,7 +115,11 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts }: {
     }
   }
 
+  const overPersonalizedCap = selected.size > PERSONALIZED_MAX;
+
   function chooseType(t: OType) {
+    // Refuse rather than send a request the server will reject. See PERSONALIZED_MAX.
+    if (t === "personalized" && overPersonalizedCap) return;
     setType(t);
     setStep(3);
     if (t === "personalized" && Object.keys(drafts).length === 0) void loadDrafts();
@@ -105,8 +135,8 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts }: {
     const rows = selectedStudents.map((s) => {
       const { first, last } = splitName(s.display_name ?? s.student_guid);
       let subj = "", body = "";
-      if (type === "personalized") { const d = drafts[s.student_guid]; subj = d?.subject ?? ""; body = d?.body ?? ""; }
-      else { subj = broadcast.subject; body = broadcast.body.replace(/\[First Name\]/g, first); }
+      if (type === "personalized") { const d = drafts[s.student_guid]; subj = mergeFirstName(d?.subject ?? "", first); body = mergeFirstName(d?.body ?? "", first); }
+      else { subj = mergeFirstName(broadcast.subject, first); body = mergeFirstName(broadcast.body, first); }
       return [first, last, "", String(s.year_in_program), s.major ?? "", s.status, subj, body];
     });
     const csv = [headers, ...rows].map((r) => r.map(csvCell).join(",")).join("\n");
@@ -183,10 +213,21 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts }: {
               <div className="mb-1 text-sm text-fg">How would you like to reach {selected.size} student{selected.size !== 1 ? "s" : ""}?</div>
               <p className="mb-4 text-sm text-muted">Stella can personalize a message per student, or you can broadcast one message to all.</p>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <button type="button" onClick={() => chooseType("personalized")} className="rounded-xl border border-border bg-panel-2 p-4 text-left transition-colors hover:bg-hover">
+                <button
+                  type="button"
+                  onClick={() => chooseType("personalized")}
+                  disabled={overPersonalizedCap}
+                  className="rounded-xl border border-border bg-panel-2 p-4 text-left transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-panel-2"
+                >
                   <Sparkles className="mb-2 size-6 text-indigo" />
                   <div className="font-medium text-fg">Personalized</div>
                   <p className="mt-1 text-xs text-muted">Stella drafts a unique message for each student from their risk signals, year, and stage. Higher engagement.</p>
+                  {overPersonalizedCap && (
+                    <p className="mt-2 text-xs text-yellow">
+                      Up to {PERSONALIZED_MAX} at a time — {selected.size} selected. Narrow the
+                      selection, or use Broadcast, which has no limit.
+                    </p>
+                  )}
                 </button>
                 <button type="button" onClick={() => chooseType("broadcast")} className="rounded-xl border border-border bg-panel-2 p-4 text-left transition-colors hover:bg-hover">
                   <Megaphone className="mb-2 size-6 text-brand" />

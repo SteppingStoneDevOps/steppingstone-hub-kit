@@ -1,7 +1,7 @@
 {
   "name": "@steppingstone/hub-kit",
-  "version": "0.7.0",
-  "description": "Shared design-system primitives for the SteppingStone hubs (advisor-hub, admin-hub, talent-hub). Single source of truth for the UI kit — consumed as source via transpilePackages + @source.",
+  "version": "0.8.0",
+  "description": "Shared design-system primitives for the SteppingStone hubs (advisor-hub, admin-hub, talent-hub). Single source of truth for the UI kit \u2014 consumed as source via transpilePackages + @source.",
   "private": false,
   "main": "./src/index.ts",
   "types": "./src/index.ts",
