@@ -7,27 +7,19 @@ import type { InstitutionOverview, CohortSummary } from "./types";
  */
 
 /**
- * The SteppingStone readiness STANDARD — a single global scale, not per-university.
- * WIRE: Lynn — breakpoints move to SS-Admin-tunable global config; do not make per-school.
+ * THE STRENGTH BANDS WERE REMOVED (Eric, 2026-09-24) — do not reintroduce them casually.
+ *
+ * `Strong / Good / Average / Weak` and their 75 / 60 / 50 cutoffs used to label every cohort here,
+ * colour its bar, and appear in two narrative sentences. They are gone, along with the colour that
+ * encoded them: a bar painted red at 47% is the same verdict as the word "Weak", so removing the
+ * label while keeping the colour would have hidden the judgement rather than withdrawn it.
+ *
+ * The reason is that it is too early to grade a university. The cutoffs were a first guess, we have
+ * no real distribution to calibrate them against, and a school reading "Weak" on its own dashboard
+ * off the back of a guess is a conversation not worth having. The PERCENTAGES stay — they are facts.
+ * Bands come back when there is real data to set them from, and they will need a deliberate decision
+ * about the numbers, not a restoration of these.
  */
-export type BandLabel = "Strong" | "Good" | "Average" | "Weak";
-const BANDS: { label: BandLabel; min: number; range: string; cls: string }[] = [
-  { label: "Strong", min: 75, range: "75%+", cls: "text-green" },
-  { label: "Good", min: 60, range: "60–74%", cls: "text-green" },
-  { label: "Average", min: 50, range: "50–59%", cls: "text-yellow" },
-  { label: "Weak", min: 0, range: "≤ 49%", cls: "text-red" },
-];
-
-export function strengthBand(onTrackPct: number): { label: BandLabel; range: string; cls: string } {
-  return BANDS.find((b) => onTrackPct >= b.min) ?? BANDS[BANDS.length - 1];
-}
-
-export const BAND_LEGEND = BANDS.map((b) => ({ label: b.label, range: b.range, cls: b.cls }));
-
-/** Color class for a strength-band LABEL (the service returns the label; the FE maps it to color). */
-export function bandClass(label: string | null | undefined): string {
-  return BANDS.find((b) => b.label === label)?.cls ?? "text-muted";
-}
 
 export interface NarrativePoint {
   what: string;    // the fact (rule-derived)
@@ -54,7 +46,7 @@ export function deriveInstitutionNarrative(o: InstitutionOverview): {
   if (strongest) {
     working.push({
       what: `${label(strongest)} leads at ${strongest.on_track_pct}% On Track.`,
-      soWhat: `The strongest cohort — ${strengthBand(strongest.on_track_pct).label} on the readiness standard.`,
+      soWhat: `The highest On Track share of any year.`,
     });
   }
   if (rising.length) {
@@ -66,7 +58,7 @@ export function deriveInstitutionNarrative(o: InstitutionOverview): {
   if (o.on_track_pct >= 60) {
     working.push({
       what: `${o.on_track_count} of ${o.total_students} students (${o.on_track_pct}%) are On Track overall.`,
-      soWhat: `Campus-wide readiness sits in the ${strengthBand(o.on_track_pct).label} band.`,
+      soWhat: `A majority of students campus-wide are On Track.`,
     });
   }
 

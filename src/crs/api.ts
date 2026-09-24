@@ -27,7 +27,8 @@ export interface ApiCohortSummary {
   year?: number | null; stage?: string | null; total?: number;
   on_track_count?: number; at_risk_count?: number; high_priority_count?: number;
   on_track_pct?: number; at_risk_pct?: number; high_priority_pct?: number;
-  momentum?: string | null; strength_band?: string | null;
+  momentum?: string | null;
+  /** The service may still send `strength_band`; we deliberately do not map it (see insights.ts). */
 }
 export interface ApiInstitutionOverview {
   total_students?: number; on_track_count?: number; at_risk_count?: number; high_priority_count?: number;
@@ -70,7 +71,6 @@ export function toCohortSummary(c: ApiCohortSummary): CohortSummary {
     at_risk_count: c.at_risk_count ?? 0,
     high_priority_count: c.high_priority_count ?? 0,
     momentum: asMomentum(c.momentum),
-    strength_band: c.strength_band ?? null,
   };
 }
 

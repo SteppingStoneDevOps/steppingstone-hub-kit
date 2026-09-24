@@ -37,7 +37,6 @@ export interface CohortSummary {
   high_priority_count: number;
   momentum: Momentum;
   /** SteppingStone readiness-standard band label, computed by the service (Strong/Good/…). */
-  strength_band: string | null;
 }
 
 /**

@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Check, TriangleAlert, Sparkles, ChevronRight } from "lucide-react";
 import { Card } from "../Card";
 import { PrintButton } from "./PrintButton";
-import { BAND_LEGEND, bandClass } from "./insights";
 import type { InstitutionOverview } from "./types";
 
 /**
@@ -77,7 +76,6 @@ export function ExecutiveOverviewView({
         <div className="mb-3 font-display text-sm font-semibold text-fg">Readiness by Year</div>
         <div className="space-y-2">
           {overview.cohorts.map((c) => {
-            const cls = bandClass(c.strength_band);
             return (
               <Link
                 key={c.year}
@@ -89,25 +87,16 @@ export function ExecutiveOverviewView({
                   <div className="text-xs text-muted">{c.stage}</div>
                 </div>
                 <div className="h-2 flex-1 overflow-hidden rounded-full bg-chip">
-                  <div className={`h-full rounded-full ${cls.replace("text-", "bg-")}`} style={{ width: `${c.on_track_pct}%` }} />
+                  <div className="h-full rounded-full bg-accent" style={{ width: `${c.on_track_pct}%` }} />
                 </div>
-                <div className={`w-12 shrink-0 text-right text-sm font-semibold ${cls}`}>{c.on_track_pct}%</div>
-                <div className={`w-20 shrink-0 rounded-full border border-current/30 px-2 py-0.5 text-center text-xs font-medium ${cls}`}>{c.strength_band ?? "—"}</div>
+                <div className="w-12 shrink-0 text-right text-sm font-semibold text-fg">{c.on_track_pct}%</div>
                 <ChevronRight className="size-4 shrink-0 text-faint" />
               </Link>
             );
           })}
         </div>
-        {/* The SteppingStone readiness standard (global; WIRE: Lynn — SS-Admin-tunable). */}
-        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border-soft pt-3 text-xs">
-          <span className="text-muted">SteppingStone readiness standard:</span>
-          {BAND_LEGEND.map((b) => (
-            <span key={b.label} className={b.cls}>
-              <span className="font-semibold">{b.label}</span> {b.range}
-            </span>
-          ))}
-        </div>
-        <p className="mt-2 text-xs text-faint">Bars show % of students On Track. Click a year to drill in.</p>
+        {/* The band legend lived here and went with the bands (see insights.ts). */}
+        <p className="mt-3 text-xs text-faint">Bars show % of students On Track. Click a year to drill in.</p>
       </Card>
 
       {/* What / So What (rule-derived) + Now What (Stella). */}
