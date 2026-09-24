@@ -14,6 +14,8 @@ export * from "./CountBadge";
 export * from "./DataTable";
 export * from "./EmptyState";
 export * from "./ErrorState";
+export * from "./support";
+export * from "./SupportLine";
 export * from "./IconButton";
 export * from "./InfoHint";
 export * from "./Modal";
