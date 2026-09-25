@@ -23,7 +23,7 @@ export function ErrorState({
   onRetry?: () => void;
   retrying?: boolean;
   /**
-   * A secondary control beside Try Again — in practice "Raise your hand" (support-spec/07, D3).
+   * A secondary control beside Try Again — in practice "Raise Your Hand" (support-spec/07, D3).
    * A failed read is exactly where a person should be able to say so, and a retry button alone
    * offers them nothing when the retry fails too.
    */

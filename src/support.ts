@@ -3,7 +3,7 @@
  * boundaries. It is deliberately not a form that posts through the platform — the root and global
  * boundaries render precisely when the hub could not reach the backend, so the one channel that
  * works there is the person's own mail app. Inside a working shell this line is a stand-in until
- * "Raise your hand" (advisor-hub/docs/support-spec/07) takes those placements; the root and global
+ * "Raise Your Hand" (advisor-hub/docs/support-spec/07) takes those placements; the root and global
  * screens keep it for good. No global Help entry, per that spec (D2). Shared here (hub-kit v0.8.0)
  * so the wording and the mailto shape change once for every hub.
  */
@@ -43,7 +43,7 @@ export function supportMailto(input: {
   return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
 }
 
-/* ── "Raise your hand" ──────────────────────────────────────────────────────────────────────
+/* ── "Raise Your Hand" ──────────────────────────────────────────────────────────────────────
  *
  * The in-product support intake (advisor-hub/docs/support-spec/07). Distinct from the mailto
  * above: that one is the last resort on a screen that could not reach the backend; this one runs
@@ -69,7 +69,7 @@ export type RaiseOutcome =
   | { outcome: "question_recorded"; issueId?: string };
 
 /** The control's label (D4). Addressed to the person, and it covers both paths. */
-export const RAISE_LABEL = "Raise your hand";
+export const RAISE_LABEL = "Raise Your Hand";
 
 /** Step one, the only judgement the person has to make. */
 export const RAISE_FORK: { kind: RaiseKind; title: string; description: string }[] = [
