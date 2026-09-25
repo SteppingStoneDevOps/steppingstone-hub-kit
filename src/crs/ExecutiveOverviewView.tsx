@@ -4,6 +4,7 @@ import { Check, TriangleAlert, Sparkles, ChevronRight } from "lucide-react";
 import { Card } from "../Card";
 import { PrintButton } from "./PrintButton";
 import type { InstitutionOverview } from "./types";
+import type { RaiseHandSlot } from "../support";
 
 /**
  * CRS Executive Overview — the shared landing for advisors and Executive Leaders.
@@ -18,6 +19,7 @@ export function ExecutiveOverviewView({
   insight,
   institutionName,
   basePath,
+  raiseHand,
 }: {
   overview: InstitutionOverview;
   /** The Stella institution insight, streamed in after the overview (a Suspense boundary). */
@@ -27,6 +29,8 @@ export function ExecutiveOverviewView({
   /** Route prefix for drill-down links — "/advisor/crs" (advisor hub) or
    *  "/admin/universities/{id}/crs" (admin hub). Keeps the shared view route-agnostic. */
   basePath: string;
+  /** The hub's Raise Your Hand control for this screen (see `RaiseHandSlot`). */
+  raiseHand?: RaiseHandSlot;
 }) {
   const { working, concerns } = overview;
   const generatedDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
@@ -54,7 +58,10 @@ export function ExecutiveOverviewView({
           <h1 className="font-display text-2xl font-bold text-fg">Executive Overview</h1>
           <p className="mt-0.5 text-sm text-muted">Institution-wide career readiness{institutionName ? ` for ${institutionName}` : ""}</p>
         </div>
-        <div className="print:hidden"><PrintButton /></div>
+        <div className="flex items-center gap-2 print:hidden">
+          {raiseHand?.("crs.institution.view")}
+          <PrintButton />
+        </div>
       </div>
 
       {/* Distribution — the status mix (not a composite). */}

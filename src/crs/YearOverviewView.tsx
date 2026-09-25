@@ -3,6 +3,7 @@ import { ArrowLeft, ChevronRight } from "lucide-react";
 import { Card } from "../Card";
 import { stageLabel, STAGE_DESC } from "./constants";
 import type { CohortSummary, Status } from "./types";
+import type { RaiseHandSlot } from "../support";
 
 /**
  * CRS Year Overview — the middle drill level (Institution → YEAR → status → student). Rows are
@@ -15,7 +16,7 @@ const STATUS_ROWS: { status: Status; cls: string; bar: string; desc: (stage: str
   { status: "High Priority", cls: "text-red", bar: "bg-red", desc: () => "Key milestones unmet — needs immediate outreach." },
 ];
 
-export function YearOverviewView({ cohort, basePath }: { cohort: CohortSummary; basePath: string }) {
+export function YearOverviewView({ cohort, basePath, raiseHand }: { cohort: CohortSummary; basePath: string; raiseHand?: RaiseHandSlot }) {
   const stage = stageLabel(cohort.year);
   const cell = (s: Status) =>
     s === "On Track"
@@ -30,9 +31,12 @@ export function YearOverviewView({ cohort, basePath }: { cohort: CohortSummary; 
         <ArrowLeft className="size-4" /> Back
       </Link>
 
-      <div className="mb-5">
+      <div className="mb-5 flex items-start justify-between gap-3">
+        <div>
         <h1 className="font-display text-2xl font-bold text-fg">Year {cohort.year} — {stage} Stage</h1>
         <p className="mt-0.5 text-sm text-muted">Students are {STAGE_DESC[cohort.year] ?? "progressing through their career-readiness journey."}</p>
+        </div>
+        {raiseHand?.("crs.cohort.view")}
       </div>
 
       <Card>

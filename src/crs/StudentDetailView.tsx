@@ -6,6 +6,7 @@ import { AskStella } from "./AskStella";
 import { SendEmail } from "./SendEmail";
 import { STAGE_LABELS as STAGE, STAGE_DESC } from "./constants";
 import type { StudentDetail, Status, AskStellaFn, GenerateOutreachFn } from "./types";
+import type { RaiseHandSlot } from "../support";
 
 /* CRS Student detail — ported from the standalone CRS UI. Leads with status + archetype;
  * NEVER shows the numeric readiness score (readiness is a distribution). Restyled to Hub tokens. */
@@ -46,7 +47,7 @@ function personalizeInsight(text: string, name: string) {
     .replace(/^This\s+student\b/i, first);
 }
 
-export function StudentDetailView({ student, askStella, generateOutreachDrafts, basePath }: { student: StudentDetail; askStella: AskStellaFn; generateOutreachDrafts: GenerateOutreachFn; basePath: string }) {
+export function StudentDetailView({ student, askStella, generateOutreachDrafts, basePath, raiseHand }: { student: StudentDetail; askStella: AskStellaFn; generateOutreachDrafts: GenerateOutreachFn; basePath: string; raiseHand?: RaiseHandSlot }) {
   const name = student.display_name ?? student.student_guid;
   const firstName = name.split(/\s+/)[0];
   const yr = student.year_in_program;
@@ -71,7 +72,10 @@ export function StudentDetailView({ student, askStella, generateOutreachDrafts, 
             {initials(name)}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="font-display text-xl font-semibold text-fg">{name}</div>
+            <div className="flex items-start justify-between gap-3">
+              <div className="font-display text-xl font-semibold text-fg">{name}</div>
+              {raiseHand?.("crs.student.view")}
+            </div>
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
               <Chip>{ORDINAL[yr] ?? `${yr}th`} Year</Chip>
               {student.major && <Chip>{student.major}</Chip>}

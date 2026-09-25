@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 /**
  * The interim support channel: a plain mailto to the monitored inbox, launched ONLY from the error
  * boundaries. It is deliberately not a form that posts through the platform — the root and global
@@ -118,3 +120,12 @@ export const RAISE_OUTCOME_COPY: Record<RaiseOutcome["outcome"], { title: string
 
 /** The escape hatch (D6). Without it we have rebuilt the knowledge base. */
 export const RAISE_ESCAPE_LABEL = "That is not what I meant";
+
+/**
+ * How a shared view receives the hub's "Raise Your Hand" control: a render prop taking the
+ * placement's action key. The CRS views are ONE piece of code mounted by both the Advisor Hub and
+ * the Admin Hub, and each owns its own submit and session, so the control is handed in rather than
+ * constructed — exactly as `askStella` and `generateOutreachDrafts` already are. Omitted, nothing
+ * renders, and the view is unchanged for a consumer that has not adopted the surface.
+ */
+export type RaiseHandSlot = (actionKey: string) => ReactNode;

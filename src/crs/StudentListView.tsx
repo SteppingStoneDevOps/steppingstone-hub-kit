@@ -8,6 +8,7 @@ import { ArchetypeChip } from "./ArchetypeChip";
 import { OutreachBuilder } from "./OutreachBuilder";
 import { stageLabel } from "./constants";
 import type { StudentSummary, Status, GenerateOutreachFn } from "./types";
+import type { RaiseHandSlot } from "../support";
 
 const STATUSES: Status[] = ["On Track", "At Risk", "High Priority"];
 const STATUS_CLS: Record<Status, string> = {
@@ -42,6 +43,7 @@ export function StudentListView({
   status,
   generateOutreachDrafts,
   basePath,
+  raiseHand,
 }: {
   students: StudentSummary[];
   year: number;
@@ -49,6 +51,8 @@ export function StudentListView({
   generateOutreachDrafts: GenerateOutreachFn;
   /** Route prefix for nav links — route-agnostic so both hubs reuse this view. */
   basePath: string;
+  /** The hub's Raise Your Hand control for this screen (see `RaiseHandSlot`). */
+  raiseHand?: RaiseHandSlot;
 }) {
   const router = useRouter();
   const [nameQuery, setNameQuery] = useState("");
@@ -88,9 +92,12 @@ export function StudentListView({
         <ArrowLeft className="size-4" /> Back
       </Link>
 
-      <div className="mb-4">
-        <h1 className="font-display text-2xl font-bold text-fg">Year {year} — {stageLabel(year)} Stage</h1>
-        <p className="mt-0.5 text-sm text-muted">Students by readiness status</p>
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-2xl font-bold text-fg">Year {year} — {stageLabel(year)} Stage</h1>
+          <p className="mt-0.5 text-sm text-muted">Students by readiness status</p>
+        </div>
+        {raiseHand?.("crs.cohort.list")}
       </div>
 
       {/* Status switcher */}
