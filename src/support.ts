@@ -42,3 +42,79 @@ export function supportMailto(input: {
   ].filter((l): l is string => l !== null);
   return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
 }
+
+/* ── "Raise your hand" ──────────────────────────────────────────────────────────────────────
+ *
+ * The in-product support intake (advisor-hub/docs/support-spec/07). Distinct from the mailto
+ * above: that one is the last resort on a screen that could not reach the backend; this one runs
+ * inside a working shell and files a real record. Deliberately NOT Stella-branded (D1) — Stella in
+ * the Advisor Hub is the CRS co-pilot, and support intake is its own thing.
+ *
+ * The types and copy live here, beside the mailto, so both hubs render one vocabulary and the
+ * wording changes in one place.
+ */
+
+/** The fork in step one (D5). `complaint` and `question` are the platform's own words. */
+export type RaiseKind = "complaint" | "question";
+
+/**
+ * What came back, as one of the four step-three outcomes. `resolved` is the configuration probe
+ * answering on the spot; `already_known` is an open defect matching the action key. Both of those
+ * keep the escape hatch (D6) — a confident answer is the worst response to a real defect.
+ */
+export type RaiseOutcome =
+  | { outcome: "resolved"; explanation: string }
+  | { outcome: "recorded"; issueId?: string }
+  | { outcome: "already_known"; summary: string; status: string }
+  | { outcome: "question_recorded"; issueId?: string };
+
+/** The control's label (D4). Addressed to the person, and it covers both paths. */
+export const RAISE_LABEL = "Raise your hand";
+
+/** Step one, the only judgement the person has to make. */
+export const RAISE_FORK: { kind: RaiseKind; title: string; description: string }[] = [
+  {
+    kind: "complaint",
+    title: "Something is broken",
+    description: "It does not work, or what it is showing looks wrong.",
+  },
+  {
+    kind: "question",
+    title: "I have a question about how this works",
+    description: "The behaviour may be correct; you want to understand it.",
+  },
+];
+
+/** Step two. No subhead under the field, per the platform rule — the placeholder carries it. */
+export const RAISE_PLACEHOLDER: Record<RaiseKind, string> = {
+  complaint: "What were you trying to do, and what happened instead?",
+  question: "What would you like to understand?",
+};
+
+/**
+ * Step three. `title` heads the outcome, `body` follows it. The resolved case appends the probe's
+ * own sentence rather than one written here: it names the configuration fact, and only the server
+ * knows it.
+ */
+export const RAISE_OUTCOME_COPY: Record<RaiseOutcome["outcome"], { title: string; body: string }> = {
+  resolved: {
+    title: "That explains it",
+    body: "Nothing has been filed, because nothing appears to be broken.",
+  },
+  recorded: {
+    title: "Thank you — that is recorded",
+    body: "Nobody else has reported this yet. Someone is looking at it now.",
+  },
+  already_known: {
+    title: "We already know about this one",
+    body: "Your report has been added to it.",
+  },
+  question_recorded: {
+    title: "Thank you — that is recorded",
+    body:
+      "This goes to the team as a question, not as a fault report, so it is not counted toward a defect.",
+  },
+};
+
+/** The escape hatch (D6). Without it we have rebuilt the knowledge base. */
+export const RAISE_ESCAPE_LABEL = "That is not what I meant";

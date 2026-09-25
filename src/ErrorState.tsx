@@ -15,12 +15,19 @@ export function ErrorState({
   message = "Something went wrong reaching the server. This is often temporary — try again in a moment.",
   onRetry,
   retrying = false,
+  action,
   className,
 }: {
   title?: string;
   message?: string;
   onRetry?: () => void;
   retrying?: boolean;
+  /**
+   * A secondary control beside Try Again — in practice "Raise your hand" (support-spec/07, D3).
+   * A failed read is exactly where a person should be able to say so, and a retry button alone
+   * offers them nothing when the retry fails too.
+   */
+  action?: React.ReactNode;
   className?: string;
 }) {
   return (
@@ -36,10 +43,15 @@ export function ErrorState({
       </div>
       <h2 className="mt-4 text-lg font-semibold text-fg">{title}</h2>
       <p className="mt-1.5 max-w-sm text-sm text-muted">{message}</p>
-      {onRetry && (
-        <Button className="mt-5" onClick={onRetry} disabled={retrying}>
-          {retrying ? "Retrying…" : "Try Again"}
-        </Button>
+      {(onRetry || action) && (
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          {onRetry && (
+            <Button onClick={onRetry} disabled={retrying}>
+              {retrying ? "Retrying…" : "Try Again"}
+            </Button>
+          )}
+          {action}
+        </div>
       )}
     </div>
   );
