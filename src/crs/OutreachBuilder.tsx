@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Sparkles, Megaphone, X, Download, Check } from "lucide-react";
 import type { StudentSummary, Status, GenerateOutreachFn } from "./types";
+import type { RaiseHandSlot } from "../support";
 
 /**
  * Bulk Outreach Builder — 3-step wizard (Select → Choose Type → Review & Export). Personalized
@@ -55,7 +56,7 @@ function Avatar({ name, size = "size-9" }: { name: string; size?: string }) {
   return <span className={`flex ${size} shrink-0 items-center justify-center rounded-full bg-indigo/15 text-xs font-semibold text-indigo`}>{initials(name)}</span>;
 }
 
-export function OutreachBuilder({ students, onClose, generateOutreachDrafts }: { students: StudentSummary[]; onClose: () => void; generateOutreachDrafts: GenerateOutreachFn }) {
+export function OutreachBuilder({ students, onClose, generateOutreachDrafts, raiseHand }: { students: StudentSummary[]; onClose: () => void; generateOutreachDrafts: GenerateOutreachFn; raiseHand?: RaiseHandSlot }) {
   const [step, setStep] = useState(1);
   const [selected, setSelected] = useState<Set<string>>(() => new Set(students.map((s) => s.student_guid)));
   const [type, setType] = useState<OType | null>(null);
@@ -203,7 +204,12 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts }: {
                 <Sparkles className="size-4 shrink-0 text-indigo" /> Stella drafted a message per student. Review and edit before exporting.
               </div>
               {draftsLoading && <div className="py-6 text-center text-sm text-muted">✦ Stella is drafting {selectedStudents.length} messages…</div>}
-              {draftsError && <div className="py-3 text-sm text-red">Failed to draft: {draftsError}</div>}
+              {draftsError && (
+                <div className="flex flex-col items-start gap-2 py-3">
+                  <div className="text-sm text-red">Failed to draft: {draftsError}</div>
+                  {raiseHand?.("crs.outreach.draft")}
+                </div>
+              )}
               {!draftsLoading && !draftsError && selectedStudents.map((s) => {
                 const name = s.display_name ?? s.student_guid;
                 const d = drafts[s.student_guid] ?? { subject: "", body: "" };

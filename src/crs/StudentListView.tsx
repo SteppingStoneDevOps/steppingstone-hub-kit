@@ -155,7 +155,7 @@ export function StudentListView({
       </div>
 
       {outreachOpen && filtered.length > 0 && (
-        <OutreachBuilder students={filtered} onClose={() => setOutreachOpen(false)} generateOutreachDrafts={generateOutreachDrafts} />
+        <OutreachBuilder students={filtered} onClose={() => setOutreachOpen(false)} generateOutreachDrafts={generateOutreachDrafts} raiseHand={raiseHand} />
       )}
 
       {/* Table */}

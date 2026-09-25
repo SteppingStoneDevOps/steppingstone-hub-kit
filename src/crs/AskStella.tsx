@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Sparkles, X, Send } from "lucide-react";
 import type { Archetype, AskStellaFn } from "./types";
+import type { RaiseHandSlot } from "../support";
 
 /**
  * "Ask Stella" — the CRS advisor co-pilot (Stella advising the ADVISOR about a student, grounded
@@ -26,11 +27,12 @@ const ARCHETYPE_PROMPTS: Record<string, string[]> = {
 };
 const GENERIC_PROMPTS = ["What should I focus on?", "Draft an outreach message"];
 
-export function AskStella({ studentGuid, firstName, archetype, askStella }: {
+export function AskStella({ studentGuid, firstName, archetype, askStella, raiseHand }: {
   studentGuid: string;
   firstName: string;
   archetype: Archetype | null;
   askStella: AskStellaFn;
+  raiseHand?: RaiseHandSlot;
 }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -103,7 +105,10 @@ export function AskStella({ studentGuid, firstName, archetype, askStella }: {
                 <span className="flex size-7 items-center justify-center rounded-full bg-indigo/20 text-indigo"><Sparkles className="size-4" /></span>
                 Ask Stella · {firstName}
               </div>
-              <button type="button" onClick={() => setOpen(false)} className="text-muted hover:text-fg"><X className="size-5" /></button>
+              <div className="flex items-center gap-2">
+                {raiseHand?.("crs.stella.ask")}
+                <button type="button" onClick={() => setOpen(false)} className="text-muted hover:text-fg"><X className="size-5" /></button>
+              </div>
             </div>
 
             {/* Thread */}

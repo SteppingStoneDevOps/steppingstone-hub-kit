@@ -209,7 +209,7 @@ export function StudentDetailView({ student, askStella, generateOutreachDrafts, 
 
         {/* Sidebar */}
         <div className="space-y-3">
-          <AskStella studentGuid={student.student_guid} firstName={firstName} archetype={student.archetype} askStella={askStella} />
+          <AskStella raiseHand={raiseHand} studentGuid={student.student_guid} firstName={firstName} archetype={student.archetype} askStella={askStella} />
           <SendEmail studentGuid={student.student_guid} firstName={firstName} generateOutreachDrafts={generateOutreachDrafts} />
           {student.stella_insights.length > 0 && (
             <Card className="border-dark-indigo/40 bg-dark-indigo/8">
