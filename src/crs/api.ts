@@ -28,7 +28,8 @@ export interface ApiCohortSummary {
   on_track_count?: number; at_risk_count?: number; high_priority_count?: number;
   on_track_pct?: number; at_risk_pct?: number; high_priority_pct?: number;
   momentum?: string | null;
-  /** The service may still send `strength_band`; we deliberately do not map it (see insights.ts). */
+  /** `strength_band` is RETIRED (see insights.ts). The service may still send it until its own
+   *  removal lands; we do not map it, and it must not be reintroduced here. */
 }
 export interface ApiInstitutionOverview {
   total_students?: number; on_track_count?: number; at_risk_count?: number; high_priority_count?: number;
