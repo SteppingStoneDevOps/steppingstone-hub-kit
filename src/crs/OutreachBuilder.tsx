@@ -108,8 +108,10 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts, rai
       const map: Record<string, { subject: string; body: string }> = {};
       res.forEach((d) => { map[d.student_guid] = { subject: d.subject, body: d.body }; });
       setDrafts(map);
-    } catch (e) {
-      setDraftsError(String(e));
+    } catch {
+      // Fixed copy, never `String(e)`: in production that was Next's masked server-action text,
+      // and in dev a raw `API POST … → 500` (audit: advisor F-V11).
+      setDraftsError("The drafts couldn't be generated just now. Try again in a moment.");
     } finally {
       setDraftsLoading(false);
     }
@@ -238,7 +240,7 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts, rai
               {draftsLoading && <div className="py-6 text-center text-sm text-muted">✦ Stella is drafting {selectedStudents.length} messages…</div>}
               {draftsError && (
                 <div className="flex flex-col items-start gap-2 py-3">
-                  <div className="text-sm text-red">Failed to draft: {draftsError}</div>
+                  <div className="text-sm text-red">{draftsError}</div>
                   {raiseHand?.("crs.outreach.draft")}
                 </div>
               )}

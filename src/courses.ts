@@ -75,7 +75,22 @@ function isCourseNumber(n: string): boolean {
  * can't resolve to a department code + number is skipped rather than imported half-formed.
  */
 export function parseCourseRows(text: string): CourseInput[] {
+  return parseCourseRowsDetailed(text).courses;
+}
+
+/** The rule a pasted row must meet, in the words the preview shows (Eric, 2026-09-29). */
+export const COURSE_ROW_RULE =
+  "a department code (letters) and a 3-digit course number, e.g. ACCT 300";
+
+/**
+ * Same parse, plus the rows it could NOT resolve — so a preview can say "N rows skipped" instead
+ * of silently importing fewer courses than were pasted (audit F-A11). `skipped` are the non-blank,
+ * non-header lines that lack a department code + 3-digit number (a `450L` or an `H201` is not a
+ * course number by the platform's rule; it is skipped and shown here, never imported half-formed).
+ */
+export function parseCourseRowsDetailed(text: string): { courses: CourseInput[]; skipped: string[] } {
   const out: CourseInput[] = [];
+  const skipped: string[] = [];
   for (const raw of text.split(/\r?\n/)) {
     const line = raw.trim();
     if (!line) continue;
@@ -86,7 +101,10 @@ export function parseCourseRows(text: string): CourseInput[] {
     if (three.length === 3 && /^[A-Za-z]{2,}$/.test(three[0])) {
       const code = three[0].toUpperCase();
       const number = stripDeptPrefix(three[1], code);
-      if (!isCourseNumber(number)) continue; // must be a 3-digit course number (like every other path)
+      if (!isCourseNumber(number)) {
+        skipped.push(line); // must be a 3-digit course number (like every other path)
+        continue;
+      }
       out.push({ code, number, title: three[2].trim() });
       continue;
     }
@@ -107,10 +125,13 @@ export function parseCourseRows(text: string): CourseInput[] {
 
     // TWO-column legacy: first cell is a combined "PREFIX###" code.
     const parsed = splitCourseCode(two[0]);
-    if (!parsed) continue; // need a real "PREFIX###" code
+    if (!parsed) {
+      skipped.push(line); // need a real "PREFIX###" code
+      continue;
+    }
     out.push({ code: parsed.code, number: parsed.number, title: (two[1] ?? "").trim() });
   }
-  return out;
+  return { courses: out, skipped };
 }
 
 /**

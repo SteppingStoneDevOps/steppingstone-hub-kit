@@ -11,7 +11,15 @@ export function Modal({
   children,
   footer,
   width = "max-w-md",
+  dismissable = true,
 }: {
+  /**
+   * When false, Escape, the X and a backdrop click are ignored — pass `!pending` from a write
+   * modal so it cannot be closed while its save is in flight (a dismissed modal unmounts, and the
+   * failure it was about to show is lost; audit F-A14). The caller's own Cancel button stays the
+   * caller's to disable.
+   */
+  dismissable?: boolean;
   open: boolean;
   onClose: () => void;
   title: string;
@@ -20,18 +28,21 @@ export function Modal({
   width?: string;
 }) {
   useEffect(() => {
-    if (!open) return;
+    if (!open || !dismissable) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [open, onClose, dismissable]);
 
   if (!open) return null;
+  const close = () => {
+    if (dismissable) onClose();
+  };
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4 pt-[8vh]"
-      onClick={onClose}
+      onClick={close}
     >
       <div
         role="dialog"
@@ -46,8 +57,9 @@ export function Modal({
         <div className="flex items-center justify-between border-b border-border-soft px-5 py-3.5">
           <h2 className="text-sm font-semibold text-fg">{title}</h2>
           <button
-            onClick={onClose}
-            className="text-muted transition-colors hover:text-fg"
+            onClick={close}
+            disabled={!dismissable}
+            className="text-muted transition-colors hover:text-fg disabled:opacity-40"
             aria-label="Close"
           >
             <X className="size-4.5" />

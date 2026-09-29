@@ -43,6 +43,8 @@ export function AskStella({ studentGuid, firstName, archetype, askStella, raiseH
 
   const prompts = (archetype && ARCHETYPE_PROMPTS[archetype]) || GENERIC_PROMPTS;
 
+  const UNREACHABLE = "I couldn't reach Stella just now. Try again in a moment.";
+
   async function open_() {
     setOpen(true);
     if (opened.current) return;
@@ -53,6 +55,11 @@ export function AskStella({ studentGuid, firstName, archetype, askStella, raiseH
       const res = await askStella(studentGuid, null, sessionId.current);
       sessionId.current = res.session_id;
       setMessages([{ role: "stella", content: res.reply }]);
+    } catch {
+      // A failed opening used to leave an empty panel that could never be retried (the ref was set
+      // first). Say so in the thread and let the next open ask again (audit: advisor F-V11).
+      opened.current = false;
+      setMessages([{ role: "stella", content: UNREACHABLE }]);
     } finally {
       setPending(false);
     }
@@ -68,6 +75,9 @@ export function AskStella({ studentGuid, firstName, archetype, askStella, raiseH
       const res = await askStella(studentGuid, msg, sessionId.current);
       sessionId.current = res.session_id;
       setMessages((m) => [...m, { role: "stella", content: res.reply }]);
+    } catch {
+      // The advisor's words stay in the thread; the reply slot says what happened.
+      setMessages((m) => [...m, { role: "stella", content: UNREACHABLE }]);
     } finally {
       setPending(false);
     }

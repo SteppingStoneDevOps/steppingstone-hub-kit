@@ -157,7 +157,18 @@ export function RaiseYourHandModal({
         </div>
       )}
 
-      {step.at === "outcome" && <Outcome result={step.result} href={myRequestsHref} />}
+      {step.at === "outcome" && (
+        <>
+          <Outcome result={step.result} href={myRequestsHref} />
+          {/* The escape-hatch submit runs from this step; its failure must show HERE, not only on
+              the describe step it never returns to (audit: advisor F-V2 / talent F-T10). */}
+          {failed && (
+            <p role="alert" className="mt-3 text-sm text-red">
+              That did not go through. Try again in a moment — nothing was lost.
+            </p>
+          )}
+        </>
+      )}
     </Modal>
   );
 
