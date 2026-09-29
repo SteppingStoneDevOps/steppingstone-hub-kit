@@ -10,8 +10,8 @@ import type { RaiseHandSlot } from "../support";
  * CRS Executive Overview — the shared landing for advisors and Executive Leaders.
  * Decisions (2026-08-23): leads with the DISTRIBUTION (status mix + cohorts), never a single
  * composite score; no fabricated KPI deltas or trend (history not retained yet); no peer
- * benchmark (deferred, FR-1); strength bands are the SteppingStone GLOBAL standard (service-
- * returned). The narrative — What/So What (rule-derived) + per-point recommendation — comes from
+ * benchmark (deferred, FR-1); no strength bands (retired 2026-09-24 — see insights.ts). The
+ * narrative — What/So What (rule-derived) + per-point recommendation — comes from
  * the service (`overview.working`/`concerns`). The `insight` slot streams in AFTER the overview.
  */
 export function ExecutiveOverviewView({
