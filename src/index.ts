@@ -25,3 +25,7 @@ export * from "./PhoneInput";
 export * from "./Skeleton";
 export * from "./form";
 export * from "./crs";
+
+// Hub monitoring (2026-09-30): the canary marker and the client-error reporter.
+export * from "./monitoring";
+export { ClientErrorReporter } from "./ClientErrorReporter";
