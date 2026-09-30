@@ -11,9 +11,6 @@ import type { RaiseHandSlot } from "../support";
 /* CRS Student detail — ported from the standalone CRS UI. Leads with status + archetype;
  * NEVER shows the numeric readiness score (readiness is a distribution). Restyled to Hub tokens. */
 
-// Demo — go-live: derive class year from the cohort.
-const GRAD_YEAR: Record<number, number> = { 1: 2029, 2: 2028, 3: 2027, 4: 2026 };
-
 const STATUS: Record<Status, { text: string; chip: string; soft: string }> = {
   "On Track": { text: "text-green", chip: "bg-green/12 text-green border-green/40", soft: "bg-green/8 border-green/30" },
   "At Risk": { text: "text-yellow", chip: "bg-yellow/12 text-yellow border-yellow/40", soft: "bg-yellow/8 border-yellow/30" },
@@ -37,9 +34,10 @@ function ago(ts?: string | null) {
 }
 // Address the student by name in Stella's insight (the backend text is guid-generic).
 // GO-LIVE (Lynn): pass the first name into generate_insight so the whole insight reads by name.
-function personalizeInsight(text: string, name: string) {
+function personalizeInsight(text: string, firstName: string) {
   if (!text) return text;
-  const first = name.trim().split(/\s+/)[0] || "This student";
+  // "this student" (no display name) reads as "This student is …" at a sentence start.
+  const first = firstName === "this student" ? "This student" : firstName;
   const aOrAn = (w: string) => (/^[aeiou]/i.test(w) ? "an" : "a");
   return text
     .replace(/^This\s+'([A-Za-z][A-Za-z -]*?)'\s+student\s+/i, (_m, arch: string) => `${first} is ${aOrAn(arch)} ${arch} student who `)
@@ -48,8 +46,12 @@ function personalizeInsight(text: string, name: string) {
 }
 
 export function StudentDetailView({ student, askStella, generateOutreachDrafts, basePath, raiseHand }: { student: StudentDetail; askStella: AskStellaFn; generateOutreachDrafts: GenerateOutreachFn; basePath: string; raiseHand?: RaiseHandSlot }) {
-  const name = student.display_name ?? student.student_guid;
-  const firstName = name.split(/\s+/)[0];
+  // A missing display name used to put the student's GUID everywhere a first name goes ("Ask Stella
+  // about 3f9c…", "Send Email to 3f9c…") (audit F-V11, 2026-09-30). Without a name the page says
+  // "Student" / "this student" and shows the ID line below, which is what the record really holds.
+  const hasName = Boolean(student.display_name?.trim());
+  const name = hasName ? student.display_name!.trim() : "Student";
+  const firstName = hasName ? name.split(/\s+/)[0] : "this student";
   const yr = student.year_in_program;
   const st = STATUS[student.status];
   const mo = MOMENTUM[student.momentum_direction] ?? MOMENTUM.stable;
@@ -79,7 +81,8 @@ export function StudentDetailView({ student, askStella, generateOutreachDrafts, 
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
               <Chip>{ORDINAL[yr] ?? `${yr}th`} Year</Chip>
               {student.major && <Chip>{student.major}</Chip>}
-              <Chip>Class of {GRAD_YEAR[yr] ?? "—"}</Chip>
+              {/* "Class of 20xx" was a demo map from year-in-program; the record carries no graduation
+                  year, so the chip is gone until it does (audit F-V11). */}
             </div>
             <div className="mt-2 flex items-center gap-2 text-xs text-muted">
               {/* Email/ID — go-live: resolve from platform (CRS store is guid-only). */}
@@ -215,7 +218,7 @@ export function StudentDetailView({ student, askStella, generateOutreachDrafts, 
             <Card className="border-dark-indigo/40 bg-dark-indigo/8">
               <div className="text-sm leading-snug text-fg">
                 <span className="font-semibold text-indigo">✦ Stella:</span>{" "}
-                {personalizeInsight(student.stella_insights[0], name)}
+                {personalizeInsight(student.stella_insights[0], firstName)}
               </div>
             </Card>
           )}

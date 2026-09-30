@@ -56,7 +56,8 @@ export function SendEmail({ studentGuid, firstName, generateOutreachDrafts }: { 
 
             <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
               <div className="mb-3 flex items-center justify-between">
-                <div className="text-sm text-muted">To <span className="font-medium text-fg">{firstName}</span> · email on file</div>
+                {/* No address is on the CRS record, so nothing here claims one is "on file" (audit F-V11). */}
+                <div className="text-sm text-muted">To <span className="font-medium text-fg">{firstName}</span></div>
                 <button type="button" onClick={draftWithStella} disabled={drafting} className="inline-flex items-center gap-1.5 rounded-lg border border-dark-indigo/40 bg-dark-indigo/10 px-2.5 py-1 text-sm font-medium text-indigo hover:opacity-90 disabled:opacity-50">
                   <Sparkles className="size-4" /> {drafting ? "Drafting…" : "Draft with Stella"}
                 </button>
