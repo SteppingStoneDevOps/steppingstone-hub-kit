@@ -26,7 +26,29 @@ package so Tailwind scans its classes.
 Then import from `@steppingstone/hub-kit` (or via the hub's existing `@/components/ui/*` re-export
 shims, which point here).
 
-## Versioning
+## Gates
 
-Tag releases (`v0.1.0`, …); hubs pin the tag in their git dependency. Bump the tag when you change a
-primitive, then update the hubs' pin.
+```bash
+npm install
+npm run typecheck   # tsc --noEmit over src
+npm run test        # vitest — the rule modules (courses, departments, services, support, CRS narrative,
+                    # archetypes) and behaviour tests for Modal, Raise Your Hand and the CRS student page
+npm run check       # both
+```
+
+CI (`.github/workflows/ci.yml`) runs both on every push and PR to `main` and on every `v*` tag. Added
+2026-09-30: before that the kit had no gates of its own and a change was proven only when each hub took
+the release. A test lives here when the behaviour it pins is shared; a hub's own test covers how the hub
+uses it.
+
+## Releasing a change
+
+1. Make the change in `src/`; add or update the test that pins it.
+2. `npm run check` — green.
+3. Bump `version` in `package.json` (semver: fix → patch, new prop or primitive → minor).
+4. Commit, tag `vX.Y.Z`, push `main` and the tag.
+5. In each consuming hub: change the pin in `package.json`
+   (`github:SteppingStoneDevOps/steppingstone-hub-kit#vX.Y.Z`), `npm install`, run the hub's four gates,
+   commit, push to `dev`.
+
+Hubs pin the tag in their git dependency, so nothing changes in a hub until it takes the release.

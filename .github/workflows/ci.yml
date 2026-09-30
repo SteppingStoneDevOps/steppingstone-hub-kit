@@ -1,0 +1,29 @@
+name: CI
+
+# The shared kit's own gates (added 2026-09-30, handoff audit X-14). Before this, hub-kit had no
+# typecheck and no tests; a change was proven only when each consuming hub took the release. Every
+# push, PR and release tag now runs both, so a shared primitive cannot regress unseen.
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
