@@ -9,7 +9,7 @@ import type { GenerateOutreachFn } from "./types";
  * draft one), copy it, and send. Platform Send is a Coming-Soon stub (auth-gated later). Client
  * island: it owns the modal + form state so the student page stays a server component.
  */
-export function SendEmail({ studentGuid, firstName, generateOutreachDrafts }: { studentGuid: string; firstName: string; generateOutreachDrafts: GenerateOutreachFn }) {
+export function SendEmail({ studentGuid, firstName, email, generateOutreachDrafts }: { studentGuid: string; firstName: string; email?: string | null; generateOutreachDrafts: GenerateOutreachFn }) {
   const [open, setOpen] = useState(false);
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
@@ -56,8 +56,8 @@ export function SendEmail({ studentGuid, firstName, generateOutreachDrafts }: { 
 
             <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
               <div className="mb-3 flex items-center justify-between">
-                {/* No address is on the CRS record, so nothing here claims one is "on file" (audit F-V11). */}
-                <div className="text-sm text-muted">To <span className="font-medium text-fg">{firstName}</span></div>
+                {/* The address is shown only when the record carries one; nothing claims "on file" otherwise (audit F-V11). */}
+                <div className="text-sm text-muted">To <span className="font-medium text-fg">{firstName}</span>{email && <> · {email}</>}</div>
                 <button type="button" onClick={draftWithStella} disabled={drafting} className="inline-flex items-center gap-1.5 rounded-lg border border-dark-indigo/40 bg-dark-indigo/10 px-2.5 py-1 text-sm font-medium text-indigo hover:opacity-90 disabled:opacity-50">
                   <Sparkles className="size-4" /> {drafting ? "Drafting…" : "Draft with Stella"}
                 </button>

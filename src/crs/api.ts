@@ -50,6 +50,7 @@ export interface ApiStudentDetail {
   overall_score?: number | null; scoring_config_version?: string | null; dimension_scores?: Record<string, unknown>; derived_features?: Record<string, unknown>;
   risk_factors?: Record<string, unknown>[]; milestones?: Record<string, unknown>[];
   recommended_steps?: string[]; activity?: Record<string, unknown>[]; insight?: string | null; last_updated?: string | null;
+  email?: string | null; expected_graduation_year?: number | null;
 }
 export interface ApiStellaReply { session_id?: string | null; message?: string | null; quick_replies?: string[] }
 export interface ApiInstitutionInsight { insight?: string | null; generated_at?: string | null }
@@ -120,6 +121,8 @@ export function toStudentDetail(d: ApiStudentDetail): StudentDetail {
   return {
     student_guid: d.student_id,
     display_name: d.name ?? null,
+    email: d.email?.trim() || null,
+    expected_graduation_year: typeof d.expected_graduation_year === "number" ? d.expected_graduation_year : null,
     major: d.major ?? null,
     program: d.program ?? null,
     year_in_program: d.year_in_program ?? 0,

@@ -81,11 +81,11 @@ export function StudentDetailView({ student, askStella, generateOutreachDrafts, 
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
               <Chip>{ORDINAL[yr] ?? `${yr}th`} Year</Chip>
               {student.major && <Chip>{student.major}</Chip>}
-              {/* "Class of 20xx" was a demo map from year-in-program; the record carries no graduation
-                  year, so the chip is gone until it does (audit F-V11). */}
+              {/* Only when the record carries a graduation year (SIS); never derived from year-in-program. */}
+              {student.expected_graduation_year && <Chip>Class of {student.expected_graduation_year}</Chip>}
             </div>
             <div className="mt-2 flex items-center gap-2 text-xs text-muted">
-              {/* Email/ID — go-live: resolve from platform (CRS store is guid-only). */}
+              {student.email && <span>{student.email}</span>}
               <span>ID {student.student_guid.slice(0, 8)}</span>
             </div>
           </div>
@@ -213,7 +213,7 @@ export function StudentDetailView({ student, askStella, generateOutreachDrafts, 
         {/* Sidebar */}
         <div className="space-y-3">
           <AskStella raiseHand={raiseHand} studentGuid={student.student_guid} firstName={firstName} archetype={student.archetype} askStella={askStella} />
-          <SendEmail studentGuid={student.student_guid} firstName={firstName} generateOutreachDrafts={generateOutreachDrafts} />
+          <SendEmail studentGuid={student.student_guid} firstName={firstName} email={student.email} generateOutreachDrafts={generateOutreachDrafts} />
           {student.stella_insights.length > 0 && (
             <Card className="border-dark-indigo/40 bg-dark-indigo/8">
               <div className="text-sm leading-snug text-fg">

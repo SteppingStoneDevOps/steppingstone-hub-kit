@@ -158,6 +158,10 @@ export interface ActivityItem {
 export interface StudentDetail {
   student_guid: string;
   display_name: string | null;
+  /** The member's address, from the platform member record (Lynn, 2026-09-30). Null when none is on file. */
+  email: string | null;
+  /** From the SIS feed when one exists; null until then — never derived from year-in-program (Lynn, 2026-09-30). */
+  expected_graduation_year: number | null;
   major: string | null;
   program: string | null;
   year_in_program: number;

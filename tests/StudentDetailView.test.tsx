@@ -12,6 +12,8 @@ const GUID = "3f9c2b1a-77d4-4e0b-9a6e-0123456789ab";
 const base: StudentDetail = {
   student_guid: GUID,
   display_name: null,
+  email: null,
+  expected_graduation_year: null,
   major: "Marketing",
   program: null,
   year_in_program: 2,
@@ -46,6 +48,12 @@ describe("StudentDetailView without a display name", () => {
     expect(text).toContain("This student is spreading effort");
     expect(text).not.toMatch(/Class of/);
     expect(text).not.toMatch(/email on file/);
+  });
+  it("shows Class of and the address only when the record carries them", () => {
+    render(<StudentDetailView student={{ ...base, display_name: "Jordan Blake", email: "jb@school.edu", expected_graduation_year: 2027 }} askStella={noop} generateOutreachDrafts={drafts} basePath="/advisor/crs" />);
+    const text = document.body.textContent ?? "";
+    expect(text).toContain("Class of 2027");
+    expect(text).toContain("jb@school.edu");
   });
   it("uses the first name when there is one", () => {
     render(<StudentDetailView student={{ ...base, display_name: "Jordan Blake" }} askStella={noop} generateOutreachDrafts={drafts} basePath="/advisor/crs" />);
