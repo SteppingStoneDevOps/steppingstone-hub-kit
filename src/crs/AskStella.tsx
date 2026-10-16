@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import { Sparkles, X, Send } from "lucide-react";
 import type { Archetype, AskStellaFn } from "./types";
 import type { RaiseHandSlot } from "../support";
+import { useEscapeToClose, useFocusTrap } from "../Modal";
 
 /**
  * "Ask Stella" — the CRS advisor co-pilot (Stella advising the ADVISOR about a student, grounded
@@ -40,6 +41,12 @@ export function AskStella({ studentGuid, firstName, archetype, askStella, raiseH
   const [pending, setPending] = useState(false);
   const sessionId = useRef<string | undefined>(undefined);
   const opened = useRef(false);
+  // The slide-in panel is a modal dialog: named by its header, focus held inside, Escape closes.
+  const panelRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  const close = useCallback(() => setOpen(false), []);
+  useFocusTrap(open, panelRef);
+  useEscapeToClose(open, close);
 
   const prompts = (archetype && ARCHETYPE_PROMPTS[archetype]) || GENERIC_PROMPTS;
 
@@ -104,25 +111,30 @@ export function AskStella({ studentGuid, firstName, archetype, askStella, raiseH
 
       {/* Slide-in chat panel */}
       {open && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/50" onClick={() => setOpen(false)}>
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/50" onClick={close}>
           <div
-            className="flex h-full w-full max-w-md flex-col border-l border-border bg-panel shadow-2xl"
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            tabIndex={-1}
+            className="flex h-full w-full max-w-md flex-col border-l border-border bg-panel shadow-2xl focus:outline-none"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-border-soft bg-panel-2 px-4 py-3">
-              <div className="flex items-center gap-2 font-display font-semibold text-fg">
-                <span className="flex size-7 items-center justify-center rounded-full bg-indigo/20 text-indigo"><Sparkles className="size-4" /></span>
+              <div id={titleId} className="flex items-center gap-2 font-display font-semibold text-fg">
+                <span className="flex size-7 items-center justify-center rounded-full bg-indigo/20 text-indigo"><Sparkles className="size-4" aria-hidden /></span>
                 Ask Stella · {firstName}
               </div>
               <div className="flex items-center gap-2">
                 {raiseHand?.("crs.stella.ask")}
-                <button type="button" onClick={() => setOpen(false)} aria-label="Close" className="text-muted hover:text-fg"><X className="size-5" /></button>
+                <button type="button" onClick={close} aria-label="Close" className="text-muted hover:text-fg"><X className="size-5" /></button>
               </div>
             </div>
 
-            {/* Thread */}
-            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4">
+            {/* Thread — a live region so a screen reader hears each reply as it lands. */}
+            <div role="log" aria-live="polite" aria-label="Conversation" className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4">
               {messages.map((m, i) =>
                 m.role === "stella" ? (
                   <div key={i} className="flex gap-2">
@@ -168,6 +180,7 @@ export function AskStella({ studentGuid, firstName, archetype, askStella, raiseH
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void send(input); } }}
+                aria-label={`Ask about ${firstName}`}
                 placeholder={`Ask about ${firstName}…`}
                 rows={1}
                 className="max-h-28 min-h-9 flex-1 resize-none rounded-lg border border-border bg-panel px-3 py-2 text-sm text-fg outline-none focus:border-indigo"

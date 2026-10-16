@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { cloneElement, useId, useRef, useState } from "react";
 import { Sparkles, Megaphone, X, Download, Check } from "lucide-react";
 import type { StudentSummary, Status, GenerateOutreachFn } from "./types";
 import type { RaiseHandSlot } from "../support";
+import { useEscapeToClose, useFocusTrap } from "../Modal";
 
 /**
  * Bulk Outreach Builder — 3-step wizard (Select → Choose Type → Review & Export). Personalized
@@ -90,6 +91,12 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts, rai
   const [draftsError, setDraftsError] = useState<string | null>(null);
   const [broadcast, setBroadcast] = useState({ ...DEFAULT_BROADCAST });
   const [sendNote, setSendNote] = useState(false);
+  // The wizard is a modal dialog for as long as it is mounted: named by its header, focus held
+  // inside, Escape closes (the host unmounts it on `onClose`).
+  const panelRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  useFocusTrap(true, panelRef);
+  useEscapeToClose(true, onClose);
 
   const selectedStudents = students.filter((s) => selected.has(s.student_guid));
 
@@ -159,11 +166,19 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts, rai
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
-      <div className="flex max-h-[90vh] w-full max-w-3xl flex-col rounded-xl border border-border bg-panel shadow-xl" onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className="flex max-h-[90vh] w-full max-w-3xl flex-col rounded-xl border border-border bg-panel shadow-xl focus:outline-none"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border-soft px-5 py-4">
-          <div className="flex items-center gap-2 font-display font-semibold text-fg">
-            <Sparkles className="size-5 text-indigo" /> Generate Student Outreach
+          <div id={titleId} className="flex items-center gap-2 font-display font-semibold text-fg">
+            <Sparkles className="size-5 text-indigo" aria-hidden /> Generate Student Outreach
           </div>
           <button type="button" onClick={onClose} aria-label="Close" className="text-muted hover:text-fg"><X className="size-5" /></button>
         </div>
@@ -240,7 +255,7 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts, rai
               {draftsLoading && <div className="py-6 text-center text-sm text-muted">✦ Stella is drafting {selectedStudents.length} messages…</div>}
               {draftsError && (
                 <div className="flex flex-col items-start gap-2 py-3">
-                  <div className="text-sm text-red">{draftsError}</div>
+                  <div role="alert" className="text-sm text-red">{draftsError}</div>
                   {raiseHand?.("crs.outreach.draft")}
                 </div>
               )}
@@ -293,7 +308,7 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts, rai
 
         {/* Footer */}
         <div className="flex items-center justify-between gap-3 border-t border-border-soft px-5 py-3">
-          <div className="text-sm text-muted">
+          <div className="text-sm text-muted" role="status">
             {sendNote ? <span className="font-medium text-indigo">Platform send is coming soon — use Export CSV for now.</span>
               : step === 1 ? "Adjust the selection, then continue."
               : step === 2 ? "Choose a type above."
@@ -313,11 +328,14 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts, rai
 }
 
 const inputCls = "w-full rounded-lg border border-border bg-panel px-3 py-2 text-sm text-fg outline-none focus:border-indigo";
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+/** Caption + control, wired as a real `<label for>` pair (the caption keeps its look). */
+function Field({ label, children }: { label: string; children: React.ReactElement<{ id?: string }> }) {
+  const uid = useId();
+  const id = children.props.id ?? uid;
   return (
     <div className="mb-2">
-      <div className="mb-1 text-xs font-medium text-muted">{label}</div>
-      {children}
+      <label htmlFor={id} className="mb-1 block text-xs font-medium text-muted">{label}</label>
+      {cloneElement(children, { id })}
     </div>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import { Mail, X, Sparkles, Copy } from "lucide-react";
 import type { GenerateOutreachFn } from "./types";
+import { useEscapeToClose, useFocusTrap } from "../Modal";
 
 /**
  * 1:1 Send Email — direct compose at the student level. Staff write a message (or have Stella
@@ -16,6 +17,12 @@ export function SendEmail({ studentGuid, firstName, email, generateOutreachDraft
   const [drafting, setDrafting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [sendNote, setSendNote] = useState(false);
+  // The compose overlay is a modal dialog: named by its header, focus held inside, Escape closes.
+  const panelRef = useRef<HTMLDivElement>(null);
+  const ids = useId();
+  const close = useCallback(() => setOpen(false), []);
+  useFocusTrap(open, panelRef);
+  useEscapeToClose(open, close);
 
   async function draftWithStella() {
     setDrafting(true);
@@ -45,13 +52,21 @@ export function SendEmail({ studentGuid, firstName, email, generateOutreachDraft
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setOpen(false)}>
-          <div className="flex max-h-[90vh] w-full max-w-xl flex-col rounded-xl border border-border bg-panel shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={close}>
+          <div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`${ids}-title`}
+            tabIndex={-1}
+            className="flex max-h-[90vh] w-full max-w-xl flex-col rounded-xl border border-border bg-panel shadow-xl focus:outline-none"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between border-b border-border-soft px-5 py-4">
-              <div className="flex items-center gap-2 font-display font-semibold text-fg">
-                <Mail className="size-5 text-indigo" /> Send Email to {firstName}
+              <div id={`${ids}-title`} className="flex items-center gap-2 font-display font-semibold text-fg">
+                <Mail className="size-5 text-indigo" aria-hidden /> Send Email to {firstName}
               </div>
-              <button type="button" onClick={() => setOpen(false)} aria-label="Close" className="text-muted hover:text-fg"><X className="size-5" /></button>
+              <button type="button" onClick={close} aria-label="Close" className="text-muted hover:text-fg"><X className="size-5" /></button>
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
@@ -62,14 +77,14 @@ export function SendEmail({ studentGuid, firstName, email, generateOutreachDraft
                   <Sparkles className="size-4" /> {drafting ? "Drafting…" : "Draft with Stella"}
                 </button>
               </div>
-              <div className="mb-1 text-xs font-medium text-muted">Subject</div>
-              <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject line" className="mb-3 w-full rounded-lg border border-border bg-panel px-3 py-2 text-sm text-fg outline-none focus:border-indigo" />
-              <div className="mb-1 text-xs font-medium text-muted">Message</div>
-              <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Write a message, or have Stella draft one…" className="min-h-48 w-full rounded-lg border border-border bg-panel px-3 py-2 text-sm text-fg outline-none focus:border-indigo" />
+              <label htmlFor={`${ids}-subject`} className="mb-1 block text-xs font-medium text-muted">Subject</label>
+              <input id={`${ids}-subject`} value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject line" className="mb-3 w-full rounded-lg border border-border bg-panel px-3 py-2 text-sm text-fg outline-none focus:border-indigo" />
+              <label htmlFor={`${ids}-body`} className="mb-1 block text-xs font-medium text-muted">Message</label>
+              <textarea id={`${ids}-body`} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Write a message, or have Stella draft one…" className="min-h-48 w-full rounded-lg border border-border bg-panel px-3 py-2 text-sm text-fg outline-none focus:border-indigo" />
             </div>
 
             <div className="flex items-center justify-between gap-3 border-t border-border-soft px-5 py-3">
-              <div className="text-sm text-muted">
+              <div className="text-sm text-muted" role="status">
                 {copied ? <span className="font-medium text-green">Copied to clipboard</span>
                   : sendNote ? <span className="font-medium text-indigo">Platform send is coming soon — copy the message for now.</span>
                   : "Compose a message, or have Stella draft one."}

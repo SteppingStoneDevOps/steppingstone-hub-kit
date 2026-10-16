@@ -11,8 +11,10 @@ const FOCUSABLE =
  * Focus management for an open dialog (HECVAT / WCAG 2.4.3): on open, focus moves to the first
  * focusable element in the panel (or the panel itself when there is none); Tab and Shift+Tab
  * cycle inside the panel; on close, focus returns to whatever had it before the dialog opened.
+ * Shared by Modal and the CRS overlays (AskStella, OutreachBuilder, SendEmail), which render
+ * their own panels; give the panel `tabIndex={-1}` so it can take focus itself.
  */
-function useFocusTrap(open: boolean, panelRef: React.RefObject<HTMLDivElement | null>) {
+export function useFocusTrap(open: boolean, panelRef: React.RefObject<HTMLDivElement | null>) {
   useEffect(() => {
     const panel = panelRef.current;
     if (!open || !panel) return;
@@ -48,6 +50,16 @@ function useFocusTrap(open: boolean, panelRef: React.RefObject<HTMLDivElement | 
   }, [open, panelRef]);
 }
 
+/** Escape closes an open dialog or popover (WCAG 2.1.2): calls `onClose` while `active`. */
+export function useEscapeToClose(active: boolean, onClose: () => void) {
+  useEffect(() => {
+    if (!active) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [active, onClose]);
+}
+
 export function Modal({
   open,
   onClose,
@@ -74,13 +86,7 @@ export function Modal({
   const panelRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
   useFocusTrap(open, panelRef);
-
-  useEffect(() => {
-    if (!open || !dismissable) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onClose, dismissable]);
+  useEscapeToClose(open && dismissable, onClose);
 
   if (!open) return null;
   const close = () => {

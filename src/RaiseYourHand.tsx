@@ -144,6 +144,7 @@ export function RaiseYourHandModal({
           <textarea
             autoFocus
             rows={5}
+            aria-label={RAISE_FORK.find((f) => f.kind === step.kind)?.title ?? RAISE_LABEL}
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder={RAISE_PLACEHOLDER[step.kind]}

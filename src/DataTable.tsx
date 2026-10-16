@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   ChevronLeft,
@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "./cn";
+import { useEscapeToClose } from "./Modal";
 
 export interface Column<T> {
   key: string;
@@ -256,6 +257,14 @@ function FilterMenu({
   const btnRef = useRef<HTMLButtonElement>(null);
   const active = value !== "All";
 
+  // The backdrop is click-only; Escape is the keyboard way out, and focus goes back to the
+  // filter button so a keyboard user is not dropped at the top of the document.
+  const dismiss = useCallback(() => {
+    setOpen(false);
+    btnRef.current?.focus();
+  }, []);
+  useEscapeToClose(open, dismiss);
+
   function toggle() {
     if (!open && btnRef.current) {
       const r = btnRef.current.getBoundingClientRect();
@@ -276,6 +285,7 @@ function FilterMenu({
         )}
         aria-label={label}
         aria-expanded={open}
+        aria-haspopup="true"
       >
         <ListFilter className="size-3.5" />
       </button>
@@ -289,6 +299,8 @@ function FilterMenu({
               onClick={() => setOpen(false)}
             />
             <div
+              role="group"
+              aria-label={label}
               className="fixed z-50 max-h-72 w-44 overflow-y-auto rounded-lg border border-border bg-panel-2 p-1 shadow-xl"
               style={{ top: pos.top, left: pos.left }}
             >
@@ -296,9 +308,10 @@ function FilterMenu({
                 <button
                   key={opt}
                   type="button"
+                  aria-pressed={opt === value}
                   onClick={() => {
                     onSelect(opt);
-                    setOpen(false);
+                    dismiss();
                   }}
                   className={cn(
                     "block w-full rounded px-2 py-1.5 text-left text-sm normal-case transition-colors hover:bg-hover",

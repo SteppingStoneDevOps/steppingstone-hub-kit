@@ -19,6 +19,8 @@ export function AppearanceCard() {
         {OPTIONS.map((o) => (
           <button
             key={o.value}
+            type="button"
+            aria-pressed={choice === o.value}
             onClick={() => setChoice(o.value)}
             className={cn(
               "inline-flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-semibold transition-colors",
