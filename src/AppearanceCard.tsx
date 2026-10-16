@@ -23,7 +23,7 @@ export function AppearanceCard() {
             className={cn(
               "inline-flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-semibold transition-colors",
               choice === o.value
-                ? "bg-indigo text-white shadow-sm"
+                ? "bg-button text-white shadow-sm"
                 : "text-muted hover:text-fg",
             )}
           >

@@ -1,7 +1,7 @@
 import { cn } from "./cn";
 
-// The one button system (see memory: button-style-standard). Pill shape, indigo
-// primary (no gradient), Title Case labels. Sizes: md (default) + sm. No red/danger
+// The one button system (see memory: button-style-standard). Pill shape, button-fill
+// primary (no gradient; --color-button, defined by each hub so white ink meets 4.5:1), Title Case labels. Sizes: md (default) + sm. No red/danger
 // variant — red is reserved for alert/error text only.
 type Variant = "primary" | "secondary" | "ghost" | "subtle";
 type Size = "sm" | "md";
@@ -12,7 +12,7 @@ const base =
 const variants: Record<Variant, string> = {
   // Indigo pill, white ink, soft glow, subtle hover lift. The main action, one per view.
   primary:
-    "bg-indigo text-white shadow-[var(--shadow-primary)] hover:brightness-110 hover:-translate-y-px hover:shadow-[var(--shadow-primary-hover)]",
+    "bg-button text-white shadow-[var(--shadow-primary)] hover:brightness-110 hover:-translate-y-px hover:shadow-[var(--shadow-primary-hover)]",
   // Filled neutral — supporting action.
   secondary: "bg-chip text-fg hover:bg-hover",
   // Outline — low-emphasis / tertiary.

@@ -39,8 +39,8 @@ export function DataTable<T>({
   onRowClick?: (row: T) => void;
   /** Extra classes per row — e.g. to de-emphasize a deactivated member. */
   rowClassName?: (row: T) => string;
-  /** enable a search box; returns true if row matches the query */
-  search?: { placeholder?: string; match: (row: T, q: string) => boolean };
+  /** enable a search box; returns true if row matches the query. `label` is the box's accessible name. */
+  search?: { placeholder?: string; label?: string; match: (row: T, q: string) => boolean };
   toolbarRight?: React.ReactNode;
   pageSize?: number;
   emptyMessage?: string;
@@ -85,7 +85,8 @@ export function DataTable<T>({
                   setPage(0);
                 }}
                 placeholder={search.placeholder ?? "Search..."}
-                className="h-9 w-full rounded-lg border border-border bg-bg/60 pl-9 pr-8 text-sm text-fg placeholder:text-faint focus:border-brand/70 focus:outline-none"
+                aria-label={search.label ?? "Search table"}
+                className="h-9 w-full rounded-lg border border-border bg-bg/60 pl-9 pr-8 text-sm text-fg placeholder:text-faint focus:border-brand/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               />
               {query && (
                 <button
@@ -114,6 +115,7 @@ export function DataTable<T>({
                     {c.header}
                     {c.filter && (
                       <FilterMenu
+                        label={`Filter ${c.header}`}
                         options={c.filter.options}
                         value={colFilters[c.key] ?? "All"}
                         onSelect={(v) => {
@@ -142,9 +144,24 @@ export function DataTable<T>({
                 <tr
                   key={getRowKey(row)}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  // A clickable row is also keyboard-reachable: tabbable, and Enter/Space activate it.
+                  // The row keeps its native table role (role="button" on a <tr> would strip the
+                  // row/cell semantics for screen readers); keys from a nested control are left alone.
+                  tabIndex={onRowClick ? 0 : undefined}
+                  onKeyDown={
+                    onRowClick
+                      ? (e) => {
+                          if (e.target !== e.currentTarget) return;
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            onRowClick(row);
+                          }
+                        }
+                      : undefined
+                  }
                   className={cn(
                     "border-b border-border-soft/60 last:border-0 transition-colors",
-                    onRowClick && "cursor-pointer hover:bg-hover",
+                    onRowClick && "cursor-pointer hover:bg-hover focus-visible:bg-hover",
                     rowClassName?.(row),
                   )}
                 >
@@ -161,22 +178,28 @@ export function DataTable<T>({
 
         <div className="flex items-center justify-between border-t border-border-soft px-4 py-2.5 text-xs text-muted">
           <div className="flex items-center gap-1">
-            <PagerButton disabled={current === 0} onClick={() => setPage(0)}>
+            <PagerButton label="First page" disabled={current === 0} onClick={() => setPage(0)}>
               <ChevronsLeft className="size-4" />
             </PagerButton>
-            <PagerButton disabled={current === 0} onClick={() => setPage(current - 1)}>
+            <PagerButton
+              label="Previous page"
+              disabled={current === 0}
+              onClick={() => setPage(current - 1)}
+            >
               <ChevronLeft className="size-4" />
             </PagerButton>
             <span className="mx-1 min-w-6 rounded bg-panel-2 px-2 py-0.5 text-center text-fg">
               {current + 1}
             </span>
             <PagerButton
+              label="Next page"
               disabled={current >= pageCount - 1}
               onClick={() => setPage(current + 1)}
             >
               <ChevronRight className="size-4" />
             </PagerButton>
             <PagerButton
+              label="Last page"
               disabled={current >= pageCount - 1}
               onClick={() => setPage(pageCount - 1)}
             >
@@ -194,15 +217,20 @@ export function DataTable<T>({
 
 function PagerButton({
   children,
+  label,
   disabled,
   onClick,
 }: {
   children: React.ReactNode;
+  /** Accessible name — the button is icon-only. */
+  label: string;
   disabled?: boolean;
   onClick: () => void;
 }) {
   return (
     <button
+      type="button"
+      aria-label={label}
       disabled={disabled}
       onClick={onClick}
       className="rounded p-1 text-muted transition-colors hover:bg-hover hover:text-fg disabled:opacity-30 disabled:hover:bg-transparent"
@@ -213,10 +241,12 @@ function PagerButton({
 }
 
 function FilterMenu({
+  label,
   options,
   value,
   onSelect,
 }: {
+  label: string;
   options: string[];
   value: string;
   onSelect: (v: string) => void;
@@ -244,7 +274,8 @@ function FilterMenu({
           "rounded p-0.5 transition-colors",
           active ? "text-brand" : "text-faint hover:text-fg",
         )}
-        aria-label="Filter"
+        aria-label={label}
+        aria-expanded={open}
       >
         <ListFilter className="size-3.5" />
       </button>

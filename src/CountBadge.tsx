@@ -12,7 +12,7 @@ export function CountBadge({
   return (
     <span
       className={cn(
-        "inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-indigo px-1 text-[10px] font-semibold text-white",
+        "inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-button px-1 text-[10px] font-semibold text-white",
         className,
       )}
     >

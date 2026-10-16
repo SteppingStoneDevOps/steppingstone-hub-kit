@@ -17,6 +17,12 @@ Styling uses the semantic Tailwind tokens (`bg-panel`, `border-border`, `text-fg
 hubs define** in their `globals.css @theme` block — the consuming app just needs to `@source` this
 package so Tailwind scans its classes.
 
+Since v0.18.0 the kit also needs **`--color-button`**: the fill behind white text on the primary
+`Button`, `CountBadge`, the selected `AppearanceCard` option and the CRS send/next buttons. It is
+separate from `--color-indigo` (links, rings, chips) so a hub can meet WCAG AA 4.5:1 for white-on-fill
+without darkening its link colour. Define it in `@theme` and in the light theme; `#4866f5` gives
+4.67:1 with white on dark, and the light theme can reuse its light indigo if that already passes.
+
 ## Consuming it (already wired in both hubs)
 
 1. `package.json` → `"@steppingstone/hub-kit": "github:SteppingStoneDevOps/steppingstone-hub-kit#v0.1.0"`

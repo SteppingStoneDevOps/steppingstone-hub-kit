@@ -141,7 +141,7 @@ export function StudentListView({
           type="button"
           onClick={() => setOutreachOpen(true)}
           disabled={filtered.length === 0}
-          className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-indigo px-3 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-40"
+          className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-button px-3 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-40"
         >
           <Sparkles className="size-4" /> Generate Outreach ({filtered.length})
         </button>

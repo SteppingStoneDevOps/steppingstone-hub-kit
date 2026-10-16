@@ -165,7 +165,7 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts, rai
           <div className="flex items-center gap-2 font-display font-semibold text-fg">
             <Sparkles className="size-5 text-indigo" /> Generate Student Outreach
           </div>
-          <button type="button" onClick={onClose} className="text-muted hover:text-fg"><X className="size-5" /></button>
+          <button type="button" onClick={onClose} aria-label="Close" className="text-muted hover:text-fg"><X className="size-5" /></button>
         </div>
 
         {/* Steps */}
@@ -173,7 +173,7 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts, rai
           {[[1, "Select Students"], [2, "Choose Type"], [3, "Review & Export"]].map(([n, label], i) => (
             <div key={n} className="flex items-center gap-2">
               <span className={`flex size-5 items-center justify-center rounded-full text-xs font-semibold ${
-                step === n ? "bg-indigo text-white" : step > (n as number) ? "bg-green/20 text-green" : "bg-chip text-muted"
+                step === n ? "bg-button text-white" : step > (n as number) ? "bg-green/20 text-green" : "bg-chip text-muted"
               }`}>{step > (n as number) ? "✓" : n}</span>
               <span className={step === n ? "text-fg" : "text-muted"}>{label}</span>
               {i < 2 && <span className="text-faint">›</span>}
@@ -302,9 +302,9 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts, rai
           </div>
           <div className="flex items-center gap-2">
             {step > 1 && <button type="button" onClick={goBack} className="rounded-lg border border-border bg-chip px-3 py-1.5 text-sm text-fg hover:bg-hover">← Back</button>}
-            {step === 1 && <button type="button" disabled={selected.size === 0} onClick={() => setStep(2)} className="rounded-lg bg-indigo px-3 py-1.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-40">Next →</button>}
+            {step === 1 && <button type="button" disabled={selected.size === 0} onClick={() => setStep(2)} className="rounded-lg bg-button px-3 py-1.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-40">Next →</button>}
             {step === 3 && <button type="button" onClick={exportCsv} className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-panel-2 px-3 py-1.5 text-sm text-fg hover:bg-hover"><Download className="size-4" /> Export CSV</button>}
-            {step === 3 && <button type="button" onClick={() => setSendNote(true)} className="rounded-lg bg-indigo px-3 py-1.5 text-sm font-medium text-white hover:opacity-90">Send</button>}
+            {step === 3 && <button type="button" onClick={() => setSendNote(true)} className="rounded-lg bg-button px-3 py-1.5 text-sm font-medium text-white hover:opacity-90">Send</button>}
           </div>
         </div>
       </div>

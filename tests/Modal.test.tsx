@@ -2,6 +2,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach } from "vitest";
+import { useState } from "react";
 import { Modal } from "../src/Modal";
 
 afterEach(cleanup);
@@ -41,5 +42,67 @@ describe("Modal dismissable", () => {
   it("renders nothing when closed", () => {
     render(<Modal open={false} onClose={() => {}} title="x"><p>hidden</p></Modal>);
     expect(screen.queryByRole("dialog")).toBeNull();
+  });
+});
+
+/*
+ * Focus management (HECVAT accessibility, 2026-10-16): focus enters the panel on open, Tab cycles
+ * inside it, and focus goes back to the opener on close. The title is the dialog's accessible name.
+ */
+describe("Modal focus", () => {
+  function Harness({ bare = false }: { bare?: boolean }) {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <button onClick={() => setOpen((o) => !o)}>Open</button>
+        {/* `bare` disables the X and passes no controls, so nothing inside is focusable. */}
+        <Modal open={open} onClose={() => setOpen(false)} title="Edit thing" dismissable={!bare}>
+          {bare ? <p>read only</p> : <input aria-label="Name" />}
+        </Modal>
+      </>
+    );
+  }
+
+  it("names the dialog by its h2 title", () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByText("Open"));
+    const dialog = screen.getByRole("dialog", { name: "Edit thing" });
+    const heading = screen.getByRole("heading", { level: 2, name: "Edit thing" });
+    expect(dialog.getAttribute("aria-labelledby")).toBe(heading.id);
+  });
+
+  it("moves focus into the panel on open and traps Tab in both directions", () => {
+    render(<Harness />);
+    const opener = screen.getByText("Open");
+    opener.focus();
+    fireEvent.click(opener);
+    const close = screen.getByLabelText("Close");
+    const name = screen.getByLabelText("Name");
+    expect(document.activeElement).toBe(close);
+    name.focus();
+    fireEvent.keyDown(document, { key: "Tab" });
+    expect(document.activeElement).toBe(close);
+    fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
+    expect(document.activeElement).toBe(name);
+  });
+
+  it("focuses the panel itself when nothing inside is focusable, and Tab stays there", () => {
+    render(<Harness bare />);
+    fireEvent.click(screen.getByText("Open"));
+    const dialog = screen.getByRole("dialog");
+    expect(document.activeElement).toBe(dialog);
+    fireEvent.keyDown(document, { key: "Tab" });
+    expect(document.activeElement).toBe(dialog);
+  });
+
+  it("returns focus to the opener on close", () => {
+    render(<Harness />);
+    const opener = screen.getByText("Open");
+    opener.focus();
+    fireEvent.click(opener);
+    expect(document.activeElement).not.toBe(opener);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(document.activeElement).toBe(opener);
   });
 });

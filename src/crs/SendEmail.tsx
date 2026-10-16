@@ -51,7 +51,7 @@ export function SendEmail({ studentGuid, firstName, email, generateOutreachDraft
               <div className="flex items-center gap-2 font-display font-semibold text-fg">
                 <Mail className="size-5 text-indigo" /> Send Email to {firstName}
               </div>
-              <button type="button" onClick={() => setOpen(false)} className="text-muted hover:text-fg"><X className="size-5" /></button>
+              <button type="button" onClick={() => setOpen(false)} aria-label="Close" className="text-muted hover:text-fg"><X className="size-5" /></button>
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
@@ -76,7 +76,7 @@ export function SendEmail({ studentGuid, firstName, email, generateOutreachDraft
               </div>
               <div className="flex items-center gap-2">
                 <button type="button" onClick={copy} className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-chip px-3 py-1.5 text-sm text-fg hover:bg-hover"><Copy className="size-4" /> Copy</button>
-                <button type="button" onClick={() => setSendNote(true)} className="rounded-lg bg-indigo px-3 py-1.5 text-sm font-medium text-white hover:opacity-90">Send</button>
+                <button type="button" onClick={() => setSendNote(true)} className="rounded-lg bg-button px-3 py-1.5 text-sm font-medium text-white hover:opacity-90">Send</button>
               </div>
             </div>
           </div>

@@ -96,7 +96,7 @@ export function AskStella({ studentGuid, firstName, archetype, askStella, raiseH
         <button
           type="button"
           onClick={open_}
-          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-indigo px-3 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-button px-3 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
         >
           <Sparkles className="size-4" /> Ask Stella
         </button>
@@ -117,7 +117,7 @@ export function AskStella({ studentGuid, firstName, archetype, askStella, raiseH
               </div>
               <div className="flex items-center gap-2">
                 {raiseHand?.("crs.stella.ask")}
-                <button type="button" onClick={() => setOpen(false)} className="text-muted hover:text-fg"><X className="size-5" /></button>
+                <button type="button" onClick={() => setOpen(false)} aria-label="Close" className="text-muted hover:text-fg"><X className="size-5" /></button>
               </div>
             </div>
 
@@ -131,7 +131,7 @@ export function AskStella({ studentGuid, firstName, archetype, askStella, raiseH
                   </div>
                 ) : (
                   <div key={i} className="flex justify-end">
-                    <div className="max-w-[85%] rounded-lg rounded-tr-sm bg-indigo px-3 py-2 text-sm text-white">{m.content}</div>
+                    <div className="max-w-[85%] rounded-lg rounded-tr-sm bg-button px-3 py-2 text-sm text-white">{m.content}</div>
                   </div>
                 ),
               )}
@@ -174,8 +174,9 @@ export function AskStella({ studentGuid, firstName, archetype, askStella, raiseH
               />
               <button
                 type="submit"
+                aria-label="Send"
                 disabled={pending || !input.trim()}
-                className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-indigo text-white transition-opacity hover:opacity-90 disabled:opacity-40"
+                className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-button text-white transition-opacity hover:opacity-90 disabled:opacity-40"
               >
                 <Send className="size-4" />
               </button>
