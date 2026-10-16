@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { createPortal, flushSync } from "react-dom";
 import {
   ChevronLeft,
   ChevronRight,
@@ -49,6 +49,33 @@ export function DataTable<T>({
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
   const [colFilters, setColFilters] = useState<Record<string, string>>({});
+  const searchRef = useRef<HTMLInputElement>(null);
+  const tableRef = useRef<HTMLDivElement>(null);
+  const pagerRefs = {
+    first: useRef<HTMLButtonElement>(null),
+    prev: useRef<HTMLButtonElement>(null),
+    next: useRef<HTMLButtonElement>(null),
+    last: useRef<HTMLButtonElement>(null),
+  };
+  type Pager = keyof typeof pagerRefs;
+  const COUNTERPART: Record<Pager, Pager> = { first: "last", last: "first", prev: "next", next: "prev" };
+
+  // Keyboard focus must not fall to <body> when the control that had it goes away (WCAG 2.4.3):
+  // clearing the search unmounts the X, so focus goes to the search box; a pager press that
+  // disables its own button hands focus to the opposite button (Next <-> Previous, First <-> Last)
+  // or, if that one is disabled too, to the table wrapper.
+  function clearSearch() {
+    setQuery("");
+    searchRef.current?.focus();
+  }
+  function goToPage(target: number, from: Pager) {
+    // Commit synchronously so the buttons' `disabled` state is the post-move one before we read it.
+    flushSync(() => setPage(target));
+    const self = pagerRefs[from].current;
+    if (!self?.disabled || self !== document.activeElement) return;
+    const other = pagerRefs[COUNTERPART[from]].current;
+    (other && !other.disabled ? other : tableRef.current)?.focus();
+  }
 
   const filtered = useMemo(() => {
     let out = rows;
@@ -80,6 +107,7 @@ export function DataTable<T>({
             <div className="relative w-full max-w-xs">
               <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-faint" />
               <input
+                ref={searchRef}
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
@@ -91,7 +119,8 @@ export function DataTable<T>({
               />
               {query && (
                 <button
-                  onClick={() => setQuery("")}
+                  type="button"
+                  onClick={clearSearch}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-faint hover:text-fg"
                   aria-label="Clear search"
                 >
@@ -106,7 +135,12 @@ export function DataTable<T>({
         </div>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-border-soft">
+      {/* tabIndex={-1}: a programmatic focus target of last resort for the pager (see goToPage). */}
+      <div
+        ref={tableRef}
+        tabIndex={-1}
+        className="overflow-hidden rounded-xl border border-border-soft focus:outline-none"
+      >
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border-soft bg-panel-2 text-left text-sm font-semibold text-muted">
@@ -179,13 +213,19 @@ export function DataTable<T>({
 
         <div className="flex items-center justify-between border-t border-border-soft px-4 py-2.5 text-xs text-muted">
           <div className="flex items-center gap-1">
-            <PagerButton label="First page" disabled={current === 0} onClick={() => setPage(0)}>
+            <PagerButton
+              ref={pagerRefs.first}
+              label="First page"
+              disabled={current === 0}
+              onClick={() => goToPage(0, "first")}
+            >
               <ChevronsLeft className="size-4" />
             </PagerButton>
             <PagerButton
+              ref={pagerRefs.prev}
               label="Previous page"
               disabled={current === 0}
-              onClick={() => setPage(current - 1)}
+              onClick={() => goToPage(current - 1, "prev")}
             >
               <ChevronLeft className="size-4" />
             </PagerButton>
@@ -193,16 +233,18 @@ export function DataTable<T>({
               {current + 1}
             </span>
             <PagerButton
+              ref={pagerRefs.next}
               label="Next page"
               disabled={current >= pageCount - 1}
-              onClick={() => setPage(current + 1)}
+              onClick={() => goToPage(current + 1, "next")}
             >
               <ChevronRight className="size-4" />
             </PagerButton>
             <PagerButton
+              ref={pagerRefs.last}
               label="Last page"
               disabled={current >= pageCount - 1}
-              onClick={() => setPage(pageCount - 1)}
+              onClick={() => goToPage(pageCount - 1, "last")}
             >
               <ChevronsRight className="size-4" />
             </PagerButton>
@@ -221,15 +263,18 @@ function PagerButton({
   label,
   disabled,
   onClick,
+  ref,
 }: {
   children: React.ReactNode;
   /** Accessible name — the button is icon-only. */
   label: string;
   disabled?: boolean;
   onClick: () => void;
+  ref?: React.Ref<HTMLButtonElement>;
 }) {
   return (
     <button
+      ref={ref}
       type="button"
       aria-label={label}
       disabled={disabled}

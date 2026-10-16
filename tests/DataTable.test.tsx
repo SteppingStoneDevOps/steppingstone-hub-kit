@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { DataTable, type Column } from "../src/DataTable";
 
 afterEach(cleanup);
@@ -61,5 +62,64 @@ describe("DataTable keyboard access", () => {
       />,
     );
     expect(screen.getByLabelText("Search members")).toBeTruthy();
+  });
+});
+
+/*
+ * Focus is never dropped to <body> (found by a real-browser keyboard walk-through of a consuming
+ * hub): Enter on "Clear search" unmounts that button, so focus goes to the search box; a pager press
+ * that disables its own button hands focus to the opposite button.
+ */
+describe("DataTable keeps keyboard focus", () => {
+  it("moves focus to the search box when Enter clears the search", async () => {
+    const user = userEvent.setup();
+    const match = (r: Row, q: string) => r.name.toLowerCase().includes(q);
+    render(<DataTable columns={columns} rows={rows} getRowKey={(r) => r.id} search={{ match }} />);
+    const box = screen.getByLabelText("Search table") as HTMLInputElement;
+    await user.click(box);
+    await user.keyboard("Row 3");
+    expect(screen.queryByText("Row 4")).toBeNull();
+    await user.tab();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Clear search" }));
+    await user.keyboard("{Enter}");
+    expect(screen.queryByRole("button", { name: "Clear search" })).toBeNull();
+    expect(box.value).toBe("");
+    expect(screen.getByText("Row 4")).toBeTruthy();
+    expect(document.activeElement).toBe(box);
+  });
+
+  it("hands focus to the counterpart when Enter on a pager button disables it", async () => {
+    const user = userEvent.setup();
+    render(<DataTable columns={columns} rows={rows} getRowKey={(r) => r.id} pageSize={4} />);
+    const first = screen.getByRole("button", { name: "First page" }) as HTMLButtonElement;
+    const prev = screen.getByRole("button", { name: "Previous page" }) as HTMLButtonElement;
+    const next = screen.getByRole("button", { name: "Next page" }) as HTMLButtonElement;
+    const last = screen.getByRole("button", { name: "Last page" }) as HTMLButtonElement;
+
+    // Next stays focused while it can still move, then yields to Previous on the last page.
+    next.focus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByText("Row 4")).toBeTruthy();
+    expect(document.activeElement).toBe(next);
+    await user.keyboard("{Enter}");
+    expect(screen.getByText("Row 8")).toBeTruthy();
+    expect(next.disabled).toBe(true);
+    expect(document.activeElement).toBe(prev);
+
+    // And back: Previous yields to Next on the first page.
+    await user.keyboard("{Enter}");
+    await user.keyboard("{Enter}");
+    expect(screen.getByText("Row 0")).toBeTruthy();
+    expect(prev.disabled).toBe(true);
+    expect(document.activeElement).toBe(next);
+
+    // Last <-> First.
+    last.focus();
+    await user.keyboard("{Enter}");
+    expect(last.disabled).toBe(true);
+    expect(document.activeElement).toBe(first);
+    await user.keyboard("{Enter}");
+    expect(first.disabled).toBe(true);
+    expect(document.activeElement).toBe(last);
   });
 });

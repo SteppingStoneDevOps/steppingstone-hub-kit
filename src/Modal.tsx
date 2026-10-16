@@ -9,18 +9,35 @@ const FOCUSABLE =
 
 /**
  * Focus management for an open dialog (HECVAT / WCAG 2.4.3): on open, focus moves to the first
- * focusable element in the panel (or the panel itself when there is none); Tab and Shift+Tab
- * cycle inside the panel; on close, focus returns to whatever had it before the dialog opened.
+ * focusable element in the panel (or the panel itself when there is none; a child with
+ * `autoFocus` keeps the focus it took); Tab and Shift+Tab cycle inside the panel; on close,
+ * focus returns to whatever had it before the dialog opened.
  * Shared by Modal and the CRS overlays (AskStella, OutreachBuilder, SendEmail), which render
  * their own panels; give the panel `tabIndex={-1}` so it can take focus itself.
  */
 export function useFocusTrap(open: boolean, panelRef: React.RefObject<HTMLDivElement | null>) {
+  // The opener is captured during the first render in which `open` is true, not in the effect:
+  // React applies a child's `autoFocus` while committing, before any effect (layout or passive)
+  // of this hook runs, so by then `document.activeElement` is already inside the panel and the
+  // close would "return" focus to an unmounted input, dropping it to <body>. A render-phase read
+  // of activeElement is deliberate here; nothing else in the render depends on it.
+  const opener = useRef<Element | null>(null);
+  const wasOpen = useRef(false);
+  if (open && !wasOpen.current && typeof document !== "undefined") {
+    opener.current = document.activeElement;
+  }
+  wasOpen.current = open;
+
   useEffect(() => {
     const panel = panelRef.current;
     if (!open || !panel) return;
-    const previous = document.activeElement;
+    const previous = opener.current;
     const focusables = () => Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE));
-    (focusables()[0] ?? panel).focus();
+    // A child that took focus with `autoFocus` wins; otherwise the first focusable, or the panel.
+    const already = document.activeElement;
+    if (!(already instanceof Node && already !== panel && panel.contains(already))) {
+      (focusables()[0] ?? panel).focus();
+    }
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Tab") return;

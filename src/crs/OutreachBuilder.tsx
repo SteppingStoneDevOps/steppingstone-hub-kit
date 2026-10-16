@@ -4,6 +4,7 @@ import { cloneElement, useId, useRef, useState } from "react";
 import { Sparkles, Megaphone, X, Download, Check } from "lucide-react";
 import type { StudentSummary, Status, GenerateOutreachFn } from "./types";
 import type { RaiseHandSlot } from "../support";
+import { tintText } from "../Badge";
 import { useEscapeToClose, useFocusTrap } from "../Modal";
 
 /**
@@ -79,7 +80,7 @@ function Badge({ status }: { status: Status }) {
   return <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${STATUS_CLS[status]}`}>{status}</span>;
 }
 function Avatar({ name, size = "size-9" }: { name: string; size?: string }) {
-  return <span className={`flex ${size} shrink-0 items-center justify-center rounded-full bg-indigo/15 text-xs font-semibold text-indigo`}>{initials(name)}</span>;
+  return <span className={`flex ${size} shrink-0 items-center justify-center rounded-full bg-indigo/15 text-xs font-semibold ${tintText.indigo}`}>{initials(name)}</span>;
 }
 
 export function OutreachBuilder({ students, onClose, generateOutreachDrafts, raiseHand }: { students: StudentSummary[]; onClose: () => void; generateOutreachDrafts: GenerateOutreachFn; raiseHand?: RaiseHandSlot }) {

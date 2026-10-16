@@ -8,13 +8,14 @@ import { ArchetypeChip } from "./ArchetypeChip";
 import { OutreachBuilder } from "./OutreachBuilder";
 import { stageLabel } from "./constants";
 import type { StudentSummary, Status, GenerateOutreachFn } from "./types";
+import { tintText } from "../Badge";
 import type { RaiseHandSlot } from "../support";
 
 const STATUSES: Status[] = ["On Track", "At Risk", "High Priority"];
 const STATUS_CLS: Record<Status, string> = {
   "On Track": "text-green border-green/40 bg-green/12",
   "At Risk": "text-yellow border-yellow/40 bg-yellow/12",
-  "High Priority": "text-red border-red/40 bg-red/12",
+  "High Priority": `${tintText.red} border-red/40 bg-red/12`,
 };
 const MOMENTUM: Record<string, { t: string; cls: string }> = {
   up: { t: "↑ Improving", cls: "text-green" },
@@ -191,7 +192,7 @@ export function StudentListView({
                       onClick={(e) => e.stopPropagation()}
                       className="flex items-center gap-2.5 font-medium text-fg hover:text-indigo"
                     >
-                      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-indigo/15 text-xs font-semibold text-indigo">{initials(name)}</span>
+                      <span className={`flex size-7 shrink-0 items-center justify-center rounded-full bg-indigo/15 text-xs font-semibold ${tintText.indigo}`}>{initials(name)}</span>
                       {name}
                     </Link>
                   </td>

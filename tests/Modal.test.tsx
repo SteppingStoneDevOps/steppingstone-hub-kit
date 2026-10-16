@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach } from "vitest";
 import { useState } from "react";
 import { Modal } from "../src/Modal";
+import { Input } from "../src/form";
 
 afterEach(cleanup);
 
@@ -101,6 +102,34 @@ describe("Modal focus", () => {
     opener.focus();
     fireEvent.click(opener);
     expect(document.activeElement).not.toBe(opener);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(document.activeElement).toBe(opener);
+  });
+
+  /*
+   * Found by a real-browser keyboard walk-through of a consuming hub: React applies a child's
+   * `autoFocus` during commit, before the trap's effect ran, so the "previous" element it captured
+   * was the input inside the panel and closing dropped focus to <body>. The opener is now captured
+   * during the opening render.
+   */
+  it("returns focus to the opener on close even when a child has autoFocus, which keeps initial focus", () => {
+    function AutoFocusHarness() {
+      const [open, setOpen] = useState(false);
+      return (
+        <>
+          <button onClick={() => setOpen((o) => !o)}>Open</button>
+          <Modal open={open} onClose={() => setOpen(false)} title="Edit thing">
+            <Input aria-label="Name" autoFocus />
+          </Modal>
+        </>
+      );
+    }
+    render(<AutoFocusHarness />);
+    const opener = screen.getByText("Open");
+    opener.focus();
+    fireEvent.click(opener);
+    expect(document.activeElement).toBe(screen.getByLabelText("Name"));
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(document.activeElement).toBe(opener);

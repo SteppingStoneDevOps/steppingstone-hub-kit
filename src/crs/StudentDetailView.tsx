@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft, Info, TriangleAlert } from "lucide-react";
+import { tintText } from "../Badge";
 import { Card } from "../Card";
 import { ArchetypeChip } from "./ArchetypeChip";
 import { AskStella } from "./AskStella";
@@ -70,7 +71,7 @@ export function StudentDetailView({ student, askStella, generateOutreachDrafts, 
       {/* Profile card */}
       <Card className="mb-4">
         <div className="flex flex-wrap items-start gap-4">
-          <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-indigo/15 text-lg font-bold text-indigo">
+          <div className={`flex size-14 shrink-0 items-center justify-center rounded-full bg-indigo/15 text-lg font-bold ${tintText.indigo}`}>
             {initials(name)}
           </div>
           <div className="min-w-0 flex-1">
@@ -200,7 +201,7 @@ export function StudentDetailView({ student, askStella, generateOutreachDrafts, 
                 <div className="space-y-2">
                   {student.recommended_next_steps.map((step, i) => (
                     <div key={i} className="flex items-start gap-2.5 rounded-lg border border-border bg-chip px-3 py-2.5">
-                      <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-indigo/15 text-xs font-semibold text-indigo">{i + 1}</span>
+                      <span className={`flex size-5 shrink-0 items-center justify-center rounded-full bg-indigo/15 text-xs font-semibold ${tintText.indigo}`}>{i + 1}</span>
                       <span className="text-sm text-fg">{step}</span>
                     </div>
                   ))}

@@ -1,3 +1,4 @@
+import { tintText } from "../Badge";
 import { ARCHETYPE_META, type ArchetypeTone } from "./archetypes";
 import type { Archetype } from "./types";
 
@@ -6,9 +7,9 @@ import type { Archetype } from "./types";
  * Pure CSS hover (Tailwind group-hover) — no client JS. Tokens flip with the theme.
  */
 const TONE: Record<ArchetypeTone, string> = {
-  danger: "text-red border-red/40 bg-red/12",
+  danger: `${tintText.red} border-red/40 bg-red/12`,
   warn: "text-yellow border-yellow/40 bg-yellow/12",
-  info: "text-indigo border-indigo/40 bg-indigo/12",
+  info: `${tintText.indigo} border-indigo/40 bg-indigo/12`,
   good: "text-green border-green/40 bg-green/12",
   neutral: "text-muted border-border bg-chip",
 };
