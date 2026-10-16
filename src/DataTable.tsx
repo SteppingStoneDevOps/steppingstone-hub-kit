@@ -69,10 +69,13 @@ export function DataTable<T>({
     searchRef.current?.focus();
   }
   function goToPage(target: number, from: Pager) {
+    const self = pagerRefs[from].current;
+    // Read focus BEFORE the commit: Chromium blurs a button the instant it becomes disabled, so
+    // after flushSync `document.activeElement` is already <body> and the check would never fire.
+    const hadFocus = self != null && self === document.activeElement;
     // Commit synchronously so the buttons' `disabled` state is the post-move one before we read it.
     flushSync(() => setPage(target));
-    const self = pagerRefs[from].current;
-    if (!self?.disabled || self !== document.activeElement) return;
+    if (!hadFocus || !self?.disabled) return;
     const other = pagerRefs[COUNTERPART[from]].current;
     (other && !other.disabled ? other : tableRef.current)?.focus();
   }
