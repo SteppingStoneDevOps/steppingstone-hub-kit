@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
-import { Field, Input, Select } from "../src/form";
+import { Field, Input, RequiredNote, Select } from "../src/form";
 
 afterEach(cleanup);
 
@@ -21,6 +21,7 @@ describe("Field", () => {
     expect(input.id).not.toBe("");
     expect(input.getAttribute("aria-invalid")).toBeNull();
     expect(input.getAttribute("aria-describedby")).toBeNull();
+    expect(input.getAttribute("aria-required")).toBeNull();
   });
 
   it("keeps an explicit id on the control", () => {
@@ -58,5 +59,55 @@ describe("Field", () => {
     );
     expect(screen.getByLabelText("From").id).toBe("");
     expect(screen.getByText("Range").getAttribute("for")).toBeNull();
+  });
+
+  // Required marking (WCAG 3.3.2, HECVAT 2026-10-18): an asterisk the accessibility tree does not
+  // see, and aria-required (never the native attribute) on the wired control.
+  it("marks a required control with a hidden asterisk and aria-required", () => {
+    render(
+      <Field label="Email" required>
+        <Input />
+      </Field>,
+    );
+    // The accessible name is still "Email": the asterisk is aria-hidden.
+    const input = screen.getByRole("textbox", { name: "Email" }) as HTMLInputElement;
+    expect(input.getAttribute("aria-required")).toBe("true");
+    expect(input.required).toBe(false);
+    const star = screen.getByText("*");
+    expect(star.getAttribute("aria-hidden")).toBe("true");
+    expect(star.closest("label")).toBe(input.labels![0]);
+  });
+
+  it("lets the child's own aria-required win", () => {
+    render(
+      <Field label="Email" required>
+        <Input aria-required={false} />
+      </Field>,
+    );
+    expect(screen.getByRole("textbox", { name: "Email" }).getAttribute("aria-required")).toBe("false");
+  });
+
+  it("gives unwired children the label marker only", () => {
+    render(
+      <Field label="Range" required>
+        <input aria-label="From" />
+        <input aria-label="To" />
+      </Field>,
+    );
+    expect(screen.getByText("*").closest("label")!.textContent).toBe("Range*");
+    expect(screen.getByLabelText("From").getAttribute("aria-required")).toBeNull();
+    expect(screen.getByLabelText("To").getAttribute("aria-required")).toBeNull();
+  });
+});
+
+describe("RequiredNote", () => {
+  it("says Required, with the asterisk hidden from the accessibility tree", () => {
+    render(<RequiredNote className="mt-2" />);
+    const note = screen.getByText(/Required/);
+    expect(note.tagName).toBe("P");
+    expect(note.textContent).toBe("* Required");
+    expect(note.className).toContain("mt-2");
+    const star = note.querySelector("[aria-hidden='true']");
+    expect(star?.textContent).toBe("*");
   });
 });

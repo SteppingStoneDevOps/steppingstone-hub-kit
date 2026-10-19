@@ -3,11 +3,13 @@ import { cn } from "./cn";
 // The one button system (see memory: button-style-standard). Pill shape, button-fill
 // primary (no gradient; --color-button, defined by each hub so white ink meets 4.5:1), Title Case labels. Sizes: md (default) + sm. No red/danger
 // variant — red is reserved for alert/error text only.
+// Under forced colors (Windows high contrast) every variant keeps a ButtonText border, so a
+// filled pill does not vanish when the system drops its background.
 type Variant = "primary" | "secondary" | "ghost" | "subtle";
 type Size = "sm" | "md";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap transition-[filter,transform,box-shadow,background-color,border-color,color] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo/60 disabled:opacity-50 disabled:pointer-events-none";
+  "inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap transition-[filter,transform,box-shadow,background-color,border-color,color] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo/60 forced-colors:border forced-colors:border-[ButtonText] disabled:opacity-50 disabled:pointer-events-none";
 
 const variants: Record<Variant, string> = {
   // Indigo pill, white ink, soft glow, subtle hover lift. The main action, one per view.

@@ -24,8 +24,9 @@ export function AppearanceCard() {
             onClick={() => setChoice(o.value)}
             className={cn(
               "inline-flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-semibold transition-colors",
+              // The fill is the selected marker; under forced colors the fill goes, so underline it.
               choice === o.value
-                ? "bg-button text-white shadow-sm"
+                ? "bg-button text-white shadow-sm forced-colors:underline"
                 : "text-muted hover:text-fg",
             )}
           >

@@ -17,7 +17,7 @@ import { Modal } from "../src/Modal";
 import { PageHeader } from "../src/PageHeader";
 import { RaiseYourHandModal } from "../src/RaiseYourHand";
 import { ThemeProvider } from "../src/ThemeProvider";
-import { Field, Input, Select, Textarea } from "../src/form";
+import { Field, Input, RequiredNote, Select, Textarea } from "../src/form";
 import { AskStella } from "../src/crs/AskStella";
 import { OutreachBuilder } from "../src/crs/OutreachBuilder";
 import { SendEmail } from "../src/crs/SendEmail";
@@ -163,10 +163,11 @@ describe("axe: primitives", () => {
     await expectClean();
   });
 
-  it("Field with Input, Textarea and Select; with hint; with error", async () => {
+  it("Field with Input, Textarea and Select; required; with hint; with error; RequiredNote", async () => {
     render(
       <form>
-        <Field label="Name">
+        <RequiredNote />
+        <Field label="Name" required>
           <Input defaultValue="Ada" />
         </Field>
         <Field label="Notes" hint="Visible to the student.">

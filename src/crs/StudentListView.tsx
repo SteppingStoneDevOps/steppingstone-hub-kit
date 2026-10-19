@@ -109,6 +109,9 @@ export function StudentListView({
             <Link
               key={s}
               href={`${basePath}/cohort/${year}/students?status=${encodeURIComponent(s)}`}
+              // The tint is the only visual state; aria-current names the showing status for screen
+              // readers and lets the hubs' forced-colors CSS underline it.
+              aria-current={active ? "page" : undefined}
               className={`rounded-full border px-3 py-1 text-sm transition-colors ${
                 active ? STATUS_CLS[s] + " font-medium" : "border-border bg-chip text-muted hover:text-fg"
               }`}
@@ -127,13 +130,13 @@ export function StudentListView({
             value={nameQuery}
             onChange={(e) => setNameQuery(e.target.value)}
             placeholder="Search students by name"
-            className="w-56 bg-transparent text-sm text-fg outline-none placeholder:text-faint"
+            className="w-56 bg-transparent text-sm text-fg focus:outline-hidden placeholder:text-faint"
           />
         </div>
         <select
           value={majorFilter}
           onChange={(e) => setMajorFilter(e.target.value)}
-          className="rounded-lg border border-border bg-panel px-3 py-1.5 text-sm text-fg outline-none"
+          className="rounded-lg border border-border bg-panel px-3 py-1.5 text-sm text-fg focus:outline-hidden"
         >
           <option value="">All Majors</option>
           {majors.map((m) => <option key={m} value={m}>{m}</option>)}

@@ -27,6 +27,10 @@ function maskPhone(raw: string): string {
  * Controlled/uncontrolled hybrid. Pass `value` + `onValueChange` to read the masked value from the
  * parent (the case a React-state form needs). Omit both to keep the standalone-masking behaviour —
  * a native form field still submits its current value via FormData.
+ *
+ * Pass `autoComplete="tel"` only when the field holds the signed-in user's own number. The default
+ * sets no `autocomplete` attribute at all (WCAG 1.3.5: a token on a school's or a colleague's
+ * number would misidentify it to autofill, and `off` is itself a hint).
  */
 export function PhoneInput({
   className,
@@ -49,7 +53,6 @@ export function PhoneInput({
     <input
       type="tel"
       inputMode="numeric"
-      autoComplete="tel"
       value={value}
       onChange={(e) => {
         const masked = maskPhone(e.target.value);

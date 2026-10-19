@@ -118,7 +118,7 @@ export function AskStella({ studentGuid, firstName, archetype, askStella, raiseH
             aria-modal="true"
             aria-labelledby={titleId}
             tabIndex={-1}
-            className="flex h-full w-full max-w-md flex-col border-l border-border bg-panel shadow-2xl focus:outline-none"
+            className="flex h-full w-full max-w-md flex-col border-l border-border bg-panel shadow-2xl focus:outline-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -183,7 +183,7 @@ export function AskStella({ studentGuid, firstName, archetype, askStella, raiseH
                 aria-label={`Ask about ${firstName}`}
                 placeholder={`Ask about ${firstName}…`}
                 rows={1}
-                className="max-h-28 min-h-9 flex-1 resize-none rounded-lg border border-border bg-panel px-3 py-2 text-sm text-fg outline-none focus:border-indigo"
+                className="max-h-28 min-h-9 flex-1 resize-none rounded-lg border border-border bg-panel px-3 py-2 text-sm text-fg focus:outline-hidden focus:border-indigo"
               />
               <button
                 type="submit"

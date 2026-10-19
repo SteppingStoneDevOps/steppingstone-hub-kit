@@ -122,7 +122,7 @@ export function Modal({
         aria-labelledby={titleId}
         tabIndex={-1}
         className={cn(
-          "w-full rounded-xl border border-border bg-panel shadow-2xl focus:outline-none",
+          "w-full rounded-xl border border-border bg-panel shadow-2xl focus:outline-hidden",
           width,
         )}
         onClick={(e) => e.stopPropagation()}

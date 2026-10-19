@@ -118,7 +118,7 @@ export function DataTable<T>({
                 }}
                 placeholder={search.placeholder ?? "Search..."}
                 aria-label={search.label ?? "Search table"}
-                className="h-9 w-full rounded-lg border border-border bg-bg/60 pl-9 pr-8 text-sm text-fg placeholder:text-faint focus:border-brand/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                className="h-9 w-full rounded-lg border border-border bg-bg/60 pl-9 pr-8 text-sm text-fg placeholder:text-faint focus:border-brand/70 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-brand"
               />
               {query && (
                 <button
@@ -142,7 +142,7 @@ export function DataTable<T>({
       <div
         ref={tableRef}
         tabIndex={-1}
-        className="overflow-hidden rounded-xl border border-border-soft focus:outline-none"
+        className="overflow-hidden rounded-xl border border-border-soft focus:outline-hidden"
       >
         <table className="w-full text-sm">
           <thead>
@@ -329,7 +329,8 @@ function FilterMenu({
         onClick={toggle}
         className={cn(
           "rounded p-0.5 transition-colors",
-          active ? "text-brand" : "text-faint hover:text-fg",
+          // The active tint is colour only; under forced colors a Highlight border marks it instead.
+          active ? "text-brand forced-colors:border forced-colors:border-[Highlight]" : "text-faint hover:text-fg",
         )}
         aria-label={label}
         aria-expanded={open}
@@ -363,7 +364,7 @@ function FilterMenu({
                   }}
                   className={cn(
                     "block w-full rounded px-2 py-1.5 text-left text-sm normal-case transition-colors hover:bg-hover",
-                    opt === value ? "text-brand" : "text-fg",
+                    opt === value ? "text-brand forced-colors:underline" : "text-fg",
                   )}
                 >
                   {opt}

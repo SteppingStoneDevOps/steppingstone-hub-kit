@@ -148,7 +148,7 @@ export function RaiseYourHandModal({
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder={RAISE_PLACEHOLDER[step.kind]}
-            className="w-full resize-y rounded-lg border border-border bg-panel-2 px-3 py-2.5 text-sm text-fg placeholder:text-faint focus:border-indigo focus:outline-none"
+            className="w-full resize-y rounded-lg border border-border bg-panel-2 px-3 py-2.5 text-sm text-fg placeholder:text-faint focus:border-indigo focus:outline-hidden"
           />
           {failed && (
             <p role="alert" className="mt-2 text-sm text-red">

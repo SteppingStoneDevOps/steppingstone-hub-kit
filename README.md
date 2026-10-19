@@ -11,7 +11,7 @@ The presentational primitives that were byte-identical across advisor-hub and ad
 
 `Button` · `Card` · `DataTable` (+ `Column`) · `Modal` · `Badge` · `CountBadge` · `EmptyState` ·
 `ErrorState` · `IconButton` · `InfoHint` · `Skeleton` (+ `PageSkeleton`, `TableSkeleton`) ·
-`form` (`Field`, `Input`, `Textarea`, `Select`, `Label`, `fieldBase`) · `cn`
+`form` (`Field`, `Input`, `Textarea`, `Select`, `Label`, `RequiredNote`, `fieldBase`) · `cn`
 
 Styling uses the semantic Tailwind tokens (`bg-panel`, `border-border`, `text-fg`, …) that **both
 hubs define** in their `globals.css @theme` block — the consuming app just needs to `@source` this
@@ -22,6 +22,21 @@ Since v0.18.0 the kit also needs **`--color-button`**: the fill behind white tex
 separate from `--color-indigo` (links, rings, chips) so a hub can meet WCAG AA 4.5:1 for white-on-fill
 without darkening its link colour. Define it in `@theme` and in the light theme; `#4866f5` gives
 4.67:1 with white on dark, and the light theme can reuse its light indigo if that already passes.
+
+## Required fields
+
+Since v0.21.0 `<Field required>` puts an asterisk after the label (`aria-hidden`, `text-indigo`, never
+red) and `aria-required` on the control. It does not set the native `required` attribute, so the
+browser's validation bubble never bypasses the hub's inline `error`; the hub still validates on
+submit. Render one `<RequiredNote />` ("* Required") above a form's first required field.
+`autocomplete` is the hub's job, and only on fields that hold the signed-in user's own data
+(WCAG 1.3.5), never on data about someone else: `PhoneInput` no longer hard-codes `tel` and sets
+no attribute unless the hub passes `autoComplete="tel"` for the user's own number.
+
+Forced colors (Windows high contrast, v0.21.0): every focusable primitive uses `outline-hidden` (a
+transparent outline the system colours make visible on focus), `Button` and `IconButton` keep a
+`ButtonText` border, and the selected states that were colour-only (`AppearanceCard`, the DataTable
+filter) gain an underline or a `Highlight` border. Nothing sets `forced-color-adjust: none`.
 
 ## Consuming it (already wired in both hubs)
 

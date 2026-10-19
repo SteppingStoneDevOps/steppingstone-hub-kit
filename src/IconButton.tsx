@@ -14,7 +14,7 @@ export function IconButton({
     <button
       aria-label={label}
       className={cn(
-        "flex size-9 items-center justify-center rounded-lg border border-border transition-colors hover:bg-hover",
+        "flex size-9 items-center justify-center rounded-lg border border-border forced-colors:border-[ButtonText] transition-colors hover:bg-hover",
         tone === "bright" ? "text-fg hover:text-fg" : "text-muted hover:text-fg",
         className,
       )}

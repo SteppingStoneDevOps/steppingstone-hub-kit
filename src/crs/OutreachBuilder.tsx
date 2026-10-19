@@ -173,7 +173,7 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts, rai
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="flex max-h-[90vh] w-full max-w-3xl flex-col rounded-xl border border-border bg-panel shadow-xl focus:outline-none"
+        className="flex max-h-[90vh] w-full max-w-3xl flex-col rounded-xl border border-border bg-panel shadow-xl focus:outline-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -328,7 +328,7 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts, rai
   );
 }
 
-const inputCls = "w-full rounded-lg border border-border bg-panel px-3 py-2 text-sm text-fg outline-none focus:border-indigo";
+const inputCls = "w-full rounded-lg border border-border bg-panel px-3 py-2 text-sm text-fg focus:outline-hidden focus:border-indigo";
 /** Caption + control, wired as a real `<label for>` pair (the caption keeps its look). */
 function Field({ label, children }: { label: string; children: React.ReactElement<{ id?: string }> }) {
   const uid = useId();

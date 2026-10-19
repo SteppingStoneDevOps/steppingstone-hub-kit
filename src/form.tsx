@@ -3,7 +3,7 @@ import { ChevronDown } from "lucide-react";
 import { cn } from "./cn";
 
 export const fieldBase =
-  "w-full rounded-lg border border-border bg-bg/60 px-3 text-sm text-fg placeholder:text-faint focus:border-brand/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand";
+  "w-full rounded-lg border border-border bg-bg/60 px-3 text-sm text-fg placeholder:text-faint focus:border-brand/70 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-brand";
 
 export function Label({
   children,
@@ -62,6 +62,7 @@ type ControlProps = {
   id?: string;
   "aria-describedby"?: string;
   "aria-invalid"?: React.AriaAttributes["aria-invalid"];
+  "aria-required"?: React.AriaAttributes["aria-required"];
 };
 
 /**
@@ -69,18 +70,28 @@ type ControlProps = {
  * Textarea or a raw control) the label is wired to it with a generated id, the hint and error
  * become its `aria-describedby`, and an error also sets `aria-invalid`. A child that carries its
  * own `id` keeps it; a fragment or multiple children render unchanged (no wiring).
+ *
+ * `required` marks the field the way WCAG 3.3.2 asks: an asterisk after the label text (hidden
+ * from assistive tech, which gets the state from the control instead) and `aria-required` on the
+ * wired control. Deliberately not the native `required` attribute: that raises the browser's own
+ * validation bubble and bypasses the hub's inline `error`. A child's own `aria-required` wins;
+ * unwired children get the label marker only. Show one `RequiredNote` above a form's first
+ * required field so the asterisk is explained once.
  */
 export function Field({
   label,
   children,
   hint,
   error,
+  required,
 }: {
   label: string;
   children: React.ReactNode;
   hint?: string;
   /** Validation message shown below the hint; also marks the control `aria-invalid`. */
   error?: string;
+  /** Asterisk after the label and `aria-required` on the control (never the native attribute). */
+  required?: boolean;
 }) {
   const uid = useId();
   const hintId = hint ? `${uid}-hint` : undefined;
@@ -97,12 +108,20 @@ export function Field({
       id: controlId,
       "aria-describedby": describedBy,
       "aria-invalid": error ? true : children.props["aria-invalid"],
+      "aria-required": children.props["aria-required"] ?? (required ? true : undefined),
     });
   }
 
   return (
     <div className="mb-4">
-      <Label htmlFor={controlId}>{label}</Label>
+      <Label htmlFor={controlId}>
+        {label}
+        {required && (
+          <span aria-hidden="true" className="ml-0.5 text-indigo">
+            *
+          </span>
+        )}
+      </Label>
       {control}
       {hint && (
         <p id={hintId} className="mt-1.5 text-xs text-faint">
@@ -115,5 +134,17 @@ export function Field({
         </p>
       )}
     </div>
+  );
+}
+
+/**
+ * "* Required", shown once above a form's first required `Field`. The asterisk is decorative
+ * (aria-hidden); the word carries the meaning.
+ */
+export function RequiredNote({ className }: { className?: string }) {
+  return (
+    <p className={cn("mb-3 text-xs text-muted", className)}>
+      <span aria-hidden="true">*</span> Required
+    </p>
   );
 }
