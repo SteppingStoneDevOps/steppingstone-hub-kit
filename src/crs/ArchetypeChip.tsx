@@ -2,7 +2,7 @@
 
 import { useId } from "react";
 import { tintText } from "../Badge";
-import { useHoverHint } from "../useHoverHint";
+import { HINT_LAYER, useHoverHint } from "../useHoverHint";
 import { ARCHETYPE_META, type ArchetypeTone } from "./archetypes";
 import type { Archetype } from "./types";
 
@@ -47,12 +47,13 @@ function ArchetypeChipWithHint({
   intervention: string;
 }) {
   const tipId = useId();
-  const { open, rootProps, triggerProps } = useHoverHint();
+  const { open, rootProps, triggerProps, bubbleRef } = useHoverHint();
   return (
     <span className="relative inline-flex" {...rootProps}>
       <button
         type="button"
         aria-describedby={tipId}
+        ref={triggerProps.ref}
         onClick={(e) => {
           triggerProps.onClick();
           // Enter or Space on the chip shows its tooltip; it must not also fire a clickable
@@ -63,12 +64,13 @@ function ArchetypeChipWithHint({
       >
         {archetype}
       </button>
-      {/* Padding, not margin, so the pointer crosses into the tooltip without leaving the wrapper. */}
-      <span className={`absolute left-0 top-full z-20 pt-1.5 ${open ? "visible" : "invisible"}`}>
+      {/* Padding, not margin, so the pointer crosses into the tooltip without leaving the wrapper.
+          Fixed and placed by useHoverHint, `hidden` while closed (WCAG 1.4.10, v0.22.1). */}
+      <span ref={bubbleRef} className={`${HINT_LAYER} ${open ? "block" : "hidden"}`}>
         <span
           id={tipId}
           role="tooltip"
-          className="block w-64 rounded-lg border border-border bg-panel-2 p-3 text-left shadow-lg shadow-black/40"
+          className="block w-64 max-w-[calc(100vw-2rem)] max-sm:w-auto max-sm:max-w-none rounded-lg border border-border bg-panel-2 p-3 text-left shadow-lg shadow-black/40"
         >
           <span className="mb-1 block text-xs font-semibold text-fg">{archetype}</span>
           <span className="mb-2 block text-xs leading-snug text-muted">{definition}</span>

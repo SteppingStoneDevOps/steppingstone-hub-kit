@@ -3,7 +3,7 @@
 import { useId } from "react";
 import { Info } from "lucide-react";
 import { cn } from "./cn";
-import { useHoverHint } from "./useHoverHint";
+import { HINT_LAYER, HINT_MAX_WIDTH, useHoverHint } from "./useHoverHint";
 
 /**
  * A small hoverable info affordance — an (i) icon that reveals a short descriptor on hover or
@@ -18,8 +18,8 @@ import { useHoverHint } from "./useHoverHint";
  * `aria-describedby` points at the bubble, so a screen reader reads the guidance on focus.
  * A client component since v0.22.0; server components can still render it.
  *
- * The bubble anchors to the icon's left edge and opens downward, so it never clips off the left
- * of a card. `label` is the icon's accessible name.
+ * The bubble opens below the icon, starting at its left edge and sliding left only as far as it
+ * must to stay on screen; under 640px it spans the viewport. `label` is the icon's accessible name.
  */
 export function InfoHint({
   children,
@@ -31,7 +31,7 @@ export function InfoHint({
   label?: string;
 }) {
   const bubbleId = useId();
-  const { open, rootProps, triggerProps } = useHoverHint();
+  const { open, rootProps, triggerProps, bubbleRef } = useHoverHint();
   return (
     <span className={cn("relative inline-flex align-middle", className)} {...rootProps}>
       <button
@@ -46,17 +46,14 @@ export function InfoHint({
         <Info className="size-3.5" aria-hidden />
       </button>
       {/* The padding, not a margin, spaces the bubble from the icon: the pointer crosses it
-          without leaving the wrapper, so the bubble stays while it is reached (hoverable). */}
-      <span
-        className={cn(
-          "absolute left-0 top-full z-30 pt-1.5 transition-[opacity,visibility] duration-150",
-          open ? "visible opacity-100" : "invisible opacity-0",
-        )}
-      >
+          without leaving the wrapper, so the bubble stays while it is reached (hoverable).
+          Fixed and placed by useHoverHint; `hidden` while closed, so it takes no layout width
+          and never causes a sideways scroll (WCAG 1.4.10, v0.22.1). */}
+      <span ref={bubbleRef} className={cn(HINT_LAYER, open ? "block" : "hidden")}>
         <span
           id={bubbleId}
           role="tooltip"
-          className="block w-max max-w-sm rounded-lg border border-border bg-panel px-3 py-2 text-xs font-normal leading-snug text-muted shadow-lg"
+          className={`block w-max max-sm:w-auto ${HINT_MAX_WIDTH} rounded-lg border border-border bg-panel px-3 py-2 text-xs font-normal leading-snug text-muted shadow-lg`}
         >
           {children}
         </span>

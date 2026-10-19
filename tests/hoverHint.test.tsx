@@ -15,9 +15,9 @@ afterEach(() => {
  * WCAG 1.4.13 Content on Hover or Focus (v0.22.0). InfoHint and ArchetypeChip share
  * useHoverHint: the content is dismissible (Escape, without moving hover or focus), hoverable
  * (the pointer can move onto it) and persistent (no timeout). The bubble is hidden with
- * `invisible` on its positioning wrapper, which jsdom cannot compute, so the tests read the class.
+ * `hidden` on its positioning wrapper (since v0.22.1; `invisible` before), read from the class.
  */
-const shown = (tip: HTMLElement) => tip.parentElement!.classList.contains("visible");
+const shown = (tip: HTMLElement) => !tip.parentElement!.classList.contains("hidden");
 
 describe("InfoHint", () => {
   it("is hidden until hovered and describes its trigger", () => {
@@ -151,5 +151,65 @@ describe("ArchetypeChip", () => {
     await user.tab();
     await user.keyboard("{Enter}");
     expect(onRow).not.toHaveBeenCalled();
+  });
+});
+
+/*
+ * WCAG 1.4.10 Reflow (v0.22.1). The bubble used to be an absolutely positioned 24rem box, which
+ * widened the page at 320px even while invisible. Closed it is now display:none; open it is
+ * position:fixed, placed from the trigger's rect: screen-wide less 16px gutters under 640px,
+ * otherwise at the trigger's left edge, slid left to stay inside the viewport. jsdom has no
+ * layout, so the viewport width and the rects are stubbed.
+ */
+describe("hint placement (reflow)", () => {
+  function stubLayout(viewport: number, trigger: Partial<DOMRect>, bubbleWidth: number) {
+    Object.defineProperty(document.documentElement, "clientWidth", { configurable: true, value: viewport });
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+      () => ({ top: 100, bottom: 120, left: 0, right: 0, width: 0, height: 20, x: 0, y: 0, toJSON: () => ({}), ...trigger }) as DOMRect,
+    );
+    vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(bubbleWidth);
+  }
+  afterEach(() => {
+    vi.restoreAllMocks();
+    delete (document.documentElement as unknown as Record<string, unknown>).clientWidth;
+  });
+
+  for (const [name, el] of [
+    ["InfoHint", <InfoHint key="i">Everyone with a seat.</InfoHint>],
+    ["ArchetypeChip", <ArchetypeChip key="a" archetype="Ascending" />],
+  ] as const) {
+    it(`${name}: closed takes no layout; open is fixed, never absolute`, () => {
+      render(el);
+      const tip = screen.getByRole("tooltip", { hidden: true });
+      const layer = tip.parentElement!;
+      expect(layer.classList.contains("hidden")).toBe(true);
+      expect(layer.classList.contains("fixed")).toBe(true);
+      expect(layer.classList.contains("absolute")).toBe(false);
+    });
+
+    it(`${name}: under 640px it spans the viewport less 16px gutters, below the trigger`, () => {
+      stubLayout(320, { left: 290, bottom: 120 }, 384);
+      render(el);
+      fireEvent.mouseEnter(screen.getAllByRole("button")[0]);
+      const layer = screen.getByRole("tooltip").parentElement!;
+      expect(layer.style.top).toBe("120px");
+      expect(layer.style.left).toBe("16px");
+      expect(layer.style.right).toBe("16px");
+    });
+  }
+
+  it("from 640px it starts at the trigger and slides left only to stay on screen", () => {
+    stubLayout(1024, { left: 900, bottom: 60 }, 300);
+    render(<InfoHint>Everyone with a seat.</InfoHint>);
+    fireEvent.mouseEnter(screen.getByRole("button"));
+    const layer = screen.getByRole("tooltip").parentElement!;
+    expect(layer.style.left).toBe(`${1024 - 16 - 300}px`);
+    expect(layer.style.right).toBe("");
+    cleanup();
+
+    stubLayout(1024, { left: 200, bottom: 60 }, 300);
+    render(<InfoHint>Everyone with a seat.</InfoHint>);
+    fireEvent.mouseEnter(screen.getByRole("button"));
+    expect(screen.getByRole("tooltip").parentElement!.style.left).toBe("200px");
   });
 });

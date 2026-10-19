@@ -31,9 +31,11 @@ export function YearOverviewView({ cohort, basePath, raiseHand }: { cohort: Coho
         <ArrowLeft className="size-4" /> Back
       </Link>
 
-      <div className="mb-5 flex items-start justify-between gap-3">
-        <div>
-        <h1 className="font-display text-2xl font-bold text-fg">Year {cohort.year} — {stage} Stage</h1>
+      {/* Wraps at 320px (WCAG 1.4.10, v0.22.1): the action drops below the title instead of
+          pushing the row past the viewport. */}
+      <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 flex-1 basis-60">
+        <h1 className="font-display text-2xl font-bold text-fg break-words">Year {cohort.year} — {stage} Stage</h1>
         <p className="mt-0.5 text-sm text-muted">Students are {STAGE_DESC[cohort.year] ?? "progressing through their career-readiness journey."}</p>
         </div>
         {raiseHand?.("crs.cohort.view")}

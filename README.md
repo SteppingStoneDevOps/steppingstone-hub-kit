@@ -54,6 +54,12 @@ underlined; a test now pins it. An active DataTable column filter adds a dot on 
 selection ("Filter Status, showing Invited"), so the state is no longer colour alone. The CRS student
 list's name search and major select carry `aria-label`s (they had none).
 
+Reflow (WCAG 1.4.10, v0.22.1): a closed hint bubble is `display: none` and takes no layout width; an open
+one is `position: fixed` under its trigger, placed by `useHoverHint` (`bubbleRef`, `HINT_LAYER`,
+`HINT_MAX_WIDTH`): screen-wide less 16px gutters below 640px, otherwise sliding left only as far as it
+must to stay on screen. Hubs can drop any `[role="tooltip"]` reflow workaround in their `globals.css`.
+The CRS Year Overview header wraps at 320px.
+
 ## Consuming it (already wired in both hubs)
 
 1. `package.json` → `"@steppingstone/hub-kit": "github:SteppingStoneDevOps/steppingstone-hub-kit#v0.1.0"`
