@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "./cn";
+import { controlBorder } from "./form";
 import { useEscapeToClose } from "./Modal";
 
 export interface Column<T> {
@@ -118,13 +119,13 @@ export function DataTable<T>({
                 }}
                 placeholder={search.placeholder ?? "Search..."}
                 aria-label={search.label ?? "Search table"}
-                className="h-9 w-full rounded-lg border border-border bg-bg/60 pl-9 pr-8 text-sm text-fg placeholder:text-faint focus:border-brand/70 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-brand"
+                className={`h-9 w-full rounded-lg border ${controlBorder} bg-bg/60 pl-9 pr-8 text-sm text-fg placeholder:text-faint focus:border-brand/70 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-brand`}
               />
               {query && (
                 <button
                   type="button"
                   onClick={clearSearch}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-faint hover:text-fg"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted hover:text-fg"
                   aria-label="Clear search"
                 >
                   <X className="size-4" />
@@ -328,15 +329,25 @@ function FilterMenu({
         type="button"
         onClick={toggle}
         className={cn(
-          "rounded p-0.5 transition-colors",
+          "relative rounded p-0.5 transition-colors",
           // The active tint is colour only; under forced colors a Highlight border marks it instead.
-          active ? "text-brand forced-colors:border forced-colors:border-[Highlight]" : "text-faint hover:text-fg",
+          active ? "text-brand forced-colors:border forced-colors:border-[Highlight]" : "text-muted hover:text-fg",
         )}
-        aria-label={label}
+        // The name carries the state too (WCAG 1.4.1 / 4.1.2): "Filter Status, showing Active".
+        aria-label={active ? `${label}, showing ${value}` : label}
         aria-expanded={open}
         aria-haspopup="true"
       >
-        <ListFilter className="size-3.5" />
+        <ListFilter className="size-3.5" aria-hidden />
+        {/* Active marker that is not colour alone: a dot appears on the icon (a shape, present or
+            absent). CanvasText keeps it under forced colors, where the fill would otherwise go. */}
+        {active && (
+          <span
+            data-filter-active=""
+            aria-hidden
+            className="absolute -right-0.5 -top-0.5 size-1.5 rounded-full bg-brand forced-colors:bg-[CanvasText]"
+          />
+        )}
       </button>
       {/* Portaled to <body> so it isn't clipped by the table's overflow-hidden. */}
       {open &&

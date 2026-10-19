@@ -123,3 +123,42 @@ describe("DataTable keeps keyboard focus", () => {
     expect(document.activeElement).toBe(last);
   });
 });
+
+/*
+ * The column filter's active state was a brand tint only (WCAG 1.4.1, v0.22.0). Active now adds a
+ * dot on the icon (a shape, not a colour) and puts the selection in the button's name.
+ */
+describe("DataTable column filter state", () => {
+  type Person = { id: string; name: string; status: string };
+  const people: Person[] = [
+    { id: "a", name: "Ada", status: "Active" },
+    { id: "b", name: "Bo", status: "Invited" },
+  ];
+  const cols: Column<Person>[] = [
+    { key: "name", header: "Name", render: (r) => r.name },
+    {
+      key: "status",
+      header: "Status",
+      render: (r) => r.status,
+      filter: { options: ["Active", "Invited"], value: (r) => r.status },
+    },
+  ];
+
+  it("marks an active filter with a dot and in its accessible name, and clears both on All", () => {
+    render(<DataTable columns={cols} rows={people} getRowKey={(r) => r.id} />);
+    const button = screen.getByRole("button", { name: "Filter Status" });
+    expect(button.querySelector("[data-filter-active]")).toBeNull();
+
+    fireEvent.click(button);
+    fireEvent.click(screen.getByRole("button", { name: "Invited" }));
+    const active = screen.getByRole("button", { name: "Filter Status, showing Invited" });
+    expect(active).toBe(button);
+    expect(active.querySelector("[data-filter-active]")).not.toBeNull();
+    expect(screen.queryByText("Ada")).toBeNull();
+
+    fireEvent.click(active);
+    fireEvent.click(screen.getByRole("button", { name: "All" }));
+    expect(screen.getByRole("button", { name: "Filter Status" }).querySelector("[data-filter-active]")).toBeNull();
+    expect(screen.getByText("Ada")).toBeTruthy();
+  });
+});

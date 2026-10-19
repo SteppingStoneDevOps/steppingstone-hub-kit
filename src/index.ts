@@ -19,6 +19,7 @@ export * from "./SupportLine";
 export * from "./RaiseYourHand";
 export * from "./IconButton";
 export * from "./InfoHint";
+export * from "./useHoverHint";
 export * from "./Modal";
 export * from "./PageHeader";
 export * from "./PhoneInput";

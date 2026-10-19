@@ -4,6 +4,7 @@ import { useCallback, useId, useRef, useState } from "react";
 import { Mail, X, Sparkles, Copy } from "lucide-react";
 import type { GenerateOutreachFn } from "./types";
 import { useEscapeToClose, useFocusTrap } from "../Modal";
+import { controlBorder } from "../form";
 
 /**
  * 1:1 Send Email — direct compose at the student level. Staff write a message (or have Stella
@@ -78,9 +79,9 @@ export function SendEmail({ studentGuid, firstName, email, generateOutreachDraft
                 </button>
               </div>
               <label htmlFor={`${ids}-subject`} className="mb-1 block text-xs font-medium text-muted">Subject</label>
-              <input id={`${ids}-subject`} value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject line" className="mb-3 w-full rounded-lg border border-border bg-panel px-3 py-2 text-sm text-fg focus:outline-hidden focus:border-indigo" />
+              <input id={`${ids}-subject`} value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject line" className={`mb-3 w-full rounded-lg border ${controlBorder} bg-panel px-3 py-2 text-sm text-fg focus:outline-hidden focus:border-indigo`} />
               <label htmlFor={`${ids}-body`} className="mb-1 block text-xs font-medium text-muted">Message</label>
-              <textarea id={`${ids}-body`} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Write a message, or have Stella draft one…" className="min-h-48 w-full rounded-lg border border-border bg-panel px-3 py-2 text-sm text-fg focus:outline-hidden focus:border-indigo" />
+              <textarea id={`${ids}-body`} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Write a message, or have Stella draft one…" className={`min-h-48 w-full rounded-lg border ${controlBorder} bg-panel px-3 py-2 text-sm text-fg focus:outline-hidden focus:border-indigo`} />
             </div>
 
             <div className="flex items-center justify-between gap-3 border-t border-border-soft px-5 py-3">

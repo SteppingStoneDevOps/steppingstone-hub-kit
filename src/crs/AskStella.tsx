@@ -5,6 +5,7 @@ import { Sparkles, X, Send } from "lucide-react";
 import type { Archetype, AskStellaFn } from "./types";
 import type { RaiseHandSlot } from "../support";
 import { useEscapeToClose, useFocusTrap } from "../Modal";
+import { controlBorder } from "../form";
 
 /**
  * "Ask Stella" — the CRS advisor co-pilot (Stella advising the ADVISOR about a student, grounded
@@ -183,7 +184,7 @@ export function AskStella({ studentGuid, firstName, archetype, askStella, raiseH
                 aria-label={`Ask about ${firstName}`}
                 placeholder={`Ask about ${firstName}…`}
                 rows={1}
-                className="max-h-28 min-h-9 flex-1 resize-none rounded-lg border border-border bg-panel px-3 py-2 text-sm text-fg focus:outline-hidden focus:border-indigo"
+                className={`max-h-28 min-h-9 flex-1 resize-none rounded-lg border ${controlBorder} bg-panel px-3 py-2 text-sm text-fg focus:outline-hidden focus:border-indigo`}
               />
               <button
                 type="submit"

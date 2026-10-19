@@ -6,6 +6,7 @@ import type { StudentSummary, Status, GenerateOutreachFn } from "./types";
 import type { RaiseHandSlot } from "../support";
 import { tintText } from "../Badge";
 import { useEscapeToClose, useFocusTrap } from "../Modal";
+import { controlBorder } from "../form";
 
 /**
  * Bulk Outreach Builder — 3-step wizard (Select → Choose Type → Review & Export). Personalized
@@ -328,7 +329,7 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts, rai
   );
 }
 
-const inputCls = "w-full rounded-lg border border-border bg-panel px-3 py-2 text-sm text-fg focus:outline-hidden focus:border-indigo";
+const inputCls = `w-full rounded-lg border ${controlBorder} bg-panel px-3 py-2 text-sm text-fg focus:outline-hidden focus:border-indigo`;
 /** Caption + control, wired as a real `<label for>` pair (the caption keeps its look). */
 function Field({ label, children }: { label: string; children: React.ReactElement<{ id?: string }> }) {
   const uid = useId();

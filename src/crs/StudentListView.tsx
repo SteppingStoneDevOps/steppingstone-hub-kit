@@ -9,6 +9,7 @@ import { OutreachBuilder } from "./OutreachBuilder";
 import { stageLabel } from "./constants";
 import type { StudentSummary, Status, GenerateOutreachFn } from "./types";
 import { tintText } from "../Badge";
+import { controlBorder } from "../form";
 import type { RaiseHandSlot } from "../support";
 
 const STATUSES: Status[] = ["On Track", "At Risk", "High Priority"];
@@ -124,9 +125,11 @@ export function StudentListView({
 
       {/* Filters */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-2 rounded-lg border border-border bg-panel px-3 py-1.5">
-          <Search className="size-4 text-faint" />
+        <div className={`flex items-center gap-2 rounded-lg border ${controlBorder} bg-panel px-3 py-1.5 focus-within:border-indigo`}>
+          <Search className="size-4 text-faint" aria-hidden />
+          {/* No room for a visible label in the toolbar; the placeholder is not a name (WCAG 1.3.1, 4.1.2). */}
           <input
+            aria-label="Search students by name"
             value={nameQuery}
             onChange={(e) => setNameQuery(e.target.value)}
             placeholder="Search students by name"
@@ -134,9 +137,10 @@ export function StudentListView({
           />
         </div>
         <select
+          aria-label="Filter by major"
           value={majorFilter}
           onChange={(e) => setMajorFilter(e.target.value)}
-          className="rounded-lg border border-border bg-panel px-3 py-1.5 text-sm text-fg focus:outline-hidden"
+          className={`rounded-lg border ${controlBorder} bg-panel px-3 py-1.5 text-sm text-fg focus:outline-hidden focus:border-indigo`}
         >
           <option value="">All Majors</option>
           {majors.map((m) => <option key={m} value={m}>{m}</option>)}

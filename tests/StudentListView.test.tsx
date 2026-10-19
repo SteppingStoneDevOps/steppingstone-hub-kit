@@ -45,3 +45,17 @@ describe("StudentListView status switcher", () => {
     }
   });
 });
+
+/*
+ * The name search and the major filter had only a placeholder and a default option, so a screen
+ * reader announced "edit text" and "combo box" with no name (WCAG 1.3.1 / 4.1.2, v0.22.0).
+ */
+describe("StudentListView filters", () => {
+  it("names the search box and the major select", () => {
+    render(
+      <StudentListView students={STUDENTS} year={2} status="At Risk" generateOutreachDrafts={drafts} basePath="/advisor/crs" />,
+    );
+    expect(screen.getByRole("textbox", { name: "Search students by name" }).tagName).toBe("INPUT");
+    expect(screen.getByRole("combobox", { name: "Filter by major" }).tagName).toBe("SELECT");
+  });
+});

@@ -2,8 +2,21 @@ import { cloneElement, isValidElement, useId } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "./cn";
 
+/**
+ * The edge of a text input, select or textarea (WCAG 1.4.11 Non-text Contrast, v0.22.0). The
+ * border is the only thing that shows where the field is, so it needs 3:1 against the surface
+ * around it and the fill inside it. `--color-border` (the card hairline) gives 1.15–1.49:1, so
+ * fields mix `--color-muted` into it instead: 55% on dark (≥3.22:1 on bg, panel and panel-2),
+ * 75% on light (≥3.16:1), the light theme being `[data-theme="light"]` as ThemeProvider sets it.
+ * The light rule is wrapped in `:where()` so it carries one class's specificity: a `focus:`
+ * border (the CRS fields' only focus cue) and a caller's className still win over it.
+ * Built only from tokens every hub already defines; cards and dividers keep `border-border`.
+ */
+export const controlBorder =
+  "border-[color-mix(in_srgb,var(--color-muted)_55%,var(--color-border))] [:where([data-theme=light])_&]:border-[color-mix(in_srgb,var(--color-muted)_75%,var(--color-border))]";
+
 export const fieldBase =
-  "w-full rounded-lg border border-border bg-bg/60 px-3 text-sm text-fg placeholder:text-faint focus:border-brand/70 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-brand";
+  `w-full rounded-lg border ${controlBorder} bg-bg/60 px-3 text-sm text-fg placeholder:text-faint focus:border-brand/70 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-brand`;
 
 export function Label({
   children,
