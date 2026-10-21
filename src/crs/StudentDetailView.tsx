@@ -75,8 +75,9 @@ export function StudentDetailView({ student, askStella, generateOutreachDrafts, 
             {initials(name)}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-3">
-              <div className="font-display text-xl font-semibold text-fg">{name}</div>
+            {/* Wraps at 320px (WCAG 1.4.10, v0.22.2): Raise Your Hand drops below a long name. */}
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="min-w-0 break-words font-display text-xl font-semibold text-fg">{name}</div>
               {raiseHand?.("crs.student.view")}
             </div>
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">

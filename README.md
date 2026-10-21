@@ -59,6 +59,8 @@ one is `position: fixed` under its trigger, placed by `useHoverHint` (`bubbleRef
 `HINT_MAX_WIDTH`): screen-wide less 16px gutters below 640px, otherwise sliding left only as far as it
 must to stay on screen. Hubs can drop any `[role="tooltip"]` reflow workaround in their `globals.css`.
 The CRS Year Overview header wraps at 320px.
+v0.22.2: the CRS student list header and the student detail name row wrap the same way, so the
+Raise Your Hand slot drops below the title or a long name at 320px instead of widening the page.
 
 ## Consuming it (already wired in both hubs)
 

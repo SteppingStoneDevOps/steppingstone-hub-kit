@@ -61,3 +61,23 @@ describe("StudentDetailView without a display name", () => {
     expect(document.body.textContent).toContain("Jordan is spreading effort");
   });
 });
+
+/*
+ * WCAG 1.4.10 Reflow (v0.22.2): Advisor's e2e reflow test found the page 59px too wide at 320px, the
+ * name and the ~147px Raise Your Hand button side by side with no way to wrap. jsdom has no layout,
+ * so this pins the classes that let the row wrap and a long name break.
+ */
+describe("StudentDetailView profile header", () => {
+  it("wraps the name and the Raise Your Hand slot instead of overflowing", () => {
+    render(
+      <StudentDetailView student={{ ...base, display_name: "Jordan Blake" }} askStella={noop} generateOutreachDrafts={drafts} basePath="/advisor/crs" raiseHand={() => <button type="button">Raise Your Hand</button>} />,
+    );
+    const button = screen.getByRole("button", { name: "Raise Your Hand" });
+    const row = button.parentElement!;
+    const name = row.firstElementChild!;
+    expect(name.textContent).toBe("Jordan Blake");
+    expect(row.className).toMatch(/(^|\s)flex-wrap(\s|$)/);
+    expect(name.className).toMatch(/(^|\s)min-w-0(\s|$)/);
+    expect(name.className).toMatch(/(^|\s)break-words(\s|$)/);
+  });
+});

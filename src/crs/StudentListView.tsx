@@ -94,9 +94,11 @@ export function StudentListView({
         <ArrowLeft className="size-4" /> Back
       </Link>
 
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-fg">Year {year} — {stageLabel(year)} Stage</h1>
+      {/* Wraps at 320px (WCAG 1.4.10, v0.22.2): the action drops below the title instead of
+          pushing the row past the viewport. */}
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 flex-1 basis-60">
+          <h1 className="font-display text-2xl font-bold text-fg break-words">Year {year} — {stageLabel(year)} Stage</h1>
           <p className="mt-0.5 text-sm text-muted">Students by readiness status</p>
         </div>
         {raiseHand?.("crs.cohort.list")}

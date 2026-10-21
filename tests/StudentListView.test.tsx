@@ -59,3 +59,23 @@ describe("StudentListView filters", () => {
     expect(screen.getByRole("combobox", { name: "Filter by major" }).tagName).toBe("SELECT");
   });
 });
+
+/*
+ * WCAG 1.4.10 Reflow (v0.22.2): with the Raise Your Hand slot, Advisor's 320px reflow test found this
+ * header too wide, the title and the action side by side with no way to wrap. jsdom has no layout, so
+ * this pins the classes that let it wrap, as YearOverviewView does.
+ */
+describe("StudentListView header", () => {
+  it("wraps the title and the action instead of overflowing", () => {
+    render(
+      <StudentListView students={STUDENTS} year={2} status="At Risk" generateOutreachDrafts={drafts} basePath="/advisor/crs" raiseHand={() => <button type="button">Raise Your Hand</button>} />,
+    );
+    const h1 = screen.getByRole("heading", { level: 1 });
+    const block = h1.parentElement!;
+    const row = block.parentElement!;
+    expect(row.className).toMatch(/(^|\s)flex-wrap(\s|$)/);
+    expect(block.className).toMatch(/(^|\s)min-w-0(\s|$)/);
+    expect(h1.className).toMatch(/(^|\s)break-words(\s|$)/);
+    expect(row.contains(screen.getByRole("button", { name: "Raise Your Hand" }))).toBe(true);
+  });
+});
