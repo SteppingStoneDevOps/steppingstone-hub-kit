@@ -8,8 +8,9 @@ import {
   useState,
 } from "react";
 
-export type ThemeChoice = "light" | "dark";
-export const THEME_KEY = "th-theme";
+// THEME_KEY and ThemeChoice live in the server-safe ./theme (re-exported from the package root),
+// so a server layout never imports them through this client module.
+import { THEME_KEY, type ThemeChoice } from "./theme";
 
 const Ctx = createContext<{
   choice: ThemeChoice;

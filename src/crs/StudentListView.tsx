@@ -14,13 +14,13 @@ import type { RaiseHandSlot } from "../support";
 
 const STATUSES: Status[] = ["On Track", "At Risk", "High Priority"];
 const STATUS_CLS: Record<Status, string> = {
-  "On Track": "text-green border-green/40 bg-green/12",
-  "At Risk": "text-yellow border-yellow/40 bg-yellow/12",
+  "On Track": `${tintText.green} border-green/40 bg-green/12`,
+  "At Risk": `${tintText.yellow} border-yellow/40 bg-yellow/12`,
   "High Priority": `${tintText.red} border-red/40 bg-red/12`,
 };
 const MOMENTUM: Record<string, { t: string; cls: string }> = {
-  up: { t: "↑ Improving", cls: "text-green" },
-  down: { t: "↓ Declining", cls: "text-red" },
+  up: { t: "↑ Improving", cls: tintText.green },
+  down: { t: "↓ Declining", cls: tintText.red },
   stable: { t: "→ Stable", cls: "text-muted" },
 };
 const ACTIVITY_LABELS: Record<string, string> = {

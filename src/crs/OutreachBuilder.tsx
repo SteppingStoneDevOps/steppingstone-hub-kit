@@ -27,9 +27,9 @@ const PERSONALIZED_MAX = 50;
 
 const YEAR_ORDINAL: Record<number, string> = { 1: "1st Year", 2: "2nd Year", 3: "3rd Year", 4: "4th Year" };
 const STATUS_CLS: Record<Status, string> = {
-  "On Track": "text-green border-green/40 bg-green/12",
-  "At Risk": "text-yellow border-yellow/40 bg-yellow/12",
-  "High Priority": "text-red border-red/40 bg-red/12",
+  "On Track": `${tintText.green} border-green/40 bg-green/12`,
+  "At Risk": `${tintText.yellow} border-yellow/40 bg-yellow/12`,
+  "High Priority": `${tintText.red} border-red/40 bg-red/12`,
 };
 const DEFAULT_BROADCAST = {
   subject: "You're Invited: Career Readiness Workshop — This Thursday",
@@ -190,7 +190,7 @@ export function OutreachBuilder({ students, onClose, generateOutreachDrafts, rai
           {[[1, "Select Students"], [2, "Choose Type"], [3, "Review & Export"]].map(([n, label], i) => (
             <div key={n} className="flex items-center gap-2">
               <span className={`flex size-5 items-center justify-center rounded-full text-xs font-semibold ${
-                step === n ? "bg-button text-white" : step > (n as number) ? "bg-green/20 text-green" : "bg-chip text-muted"
+                step === n ? "bg-button text-white" : step > (n as number) ? `bg-green/20 ${tintText.green}` : "bg-chip text-muted"
               }`}>{step > (n as number) ? "✓" : n}</span>
               <span className={step === n ? "text-fg" : "text-muted"}>{label}</span>
               {i < 2 && <span className="text-faint">›</span>}

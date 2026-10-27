@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { Check, TriangleAlert, Sparkles, ChevronRight } from "lucide-react";
 import { Card } from "../Card";
+import { tintText } from "../Badge";
 import { PrintButton } from "./PrintButton";
 import type { InstitutionOverview } from "./types";
 import type { RaiseHandSlot } from "../support";
@@ -36,9 +37,9 @@ export function ExecutiveOverviewView({
   const generatedDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 
   const distribution = [
-    { label: "On Track", count: overview.on_track_count, pct: overview.on_track_pct, cls: "text-green", bar: "bg-green" },
-    { label: "At Risk", count: overview.at_risk_count, pct: overview.at_risk_pct, cls: "text-yellow", bar: "bg-yellow" },
-    { label: "High Priority", count: overview.high_priority_count, pct: overview.high_priority_pct, cls: "text-red", bar: "bg-red" },
+    { label: "On Track", count: overview.on_track_count, pct: overview.on_track_pct, cls: tintText.green, bar: "bg-green" },
+    { label: "At Risk", count: overview.at_risk_count, pct: overview.at_risk_pct, cls: tintText.yellow, bar: "bg-yellow" },
+    { label: "High Priority", count: overview.high_priority_count, pct: overview.high_priority_pct, cls: tintText.red, bar: "bg-red" },
   ];
 
   return (

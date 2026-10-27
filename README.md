@@ -62,6 +62,26 @@ The CRS Year Overview header wraps at 320px.
 v0.22.2: the CRS student list header and the student detail name row wrap the same way, so the
 Raise Your Hand slot drops below the title or a long name at 320px instead of widening the page.
 
+## Theme script, focus recovery, chip text (v0.23.0, 2026-10-27)
+
+- **Server-safe theme module.** `THEME_KEY`, `ThemeChoice` and `noFlashThemeScript` live in
+  `src/theme.ts`, which has no `"use client"`; `ThemeProvider` imports them from there and the package
+  root still exports all three. A server `app/layout.tsx` that imported `THEME_KEY` through the client
+  `ThemeProvider` got a client reference, so its inline script shipped Next's "Attempted to call
+  THEME_KEY() from the server" text, threw, and a saved light theme flashed dark. Hubs drop their own
+  template string and render
+  `<script dangerouslySetInnerHTML={{ __html: noFlashThemeScript }} />` with
+  `import { noFlashThemeScript } from "@steppingstone/hub-kit"`.
+- **Focus recovery** (WCAG 2.4.3): `useFocusTrap` puts focus back on the panel when the focused control
+  is disabled or removed (a submit button turning into "Saving…") and focus falls to `<body>`. It acts
+  on the next frame, only while the dialog is open, and never overrides a move to a real element. It
+  sets `tabIndex=-1` on a panel that has none.
+- **`EmptyState headingLevel`** (`1 | 2 | 3`, default 3), so an empty state directly under the h1 is an h2.
+- **Chip text** (WCAG 1.4.3): `tintText` gains `brand`, `green` and `yellow` (70% token + 30% fg) and
+  `Badge`, the CRS status chips, archetype chips, momentum text, stage steps and overview percentages
+  use it. With the light tokens brand `#05698f`, green `#057064`, yellow `#7f5408`, red `#c0253f`,
+  muted `#526178` every chip is at least 4.95:1 on bg, panel and panel-2 in both themes.
+
 ## Consuming it (already wired in both hubs)
 
 1. `package.json` → `"@steppingstone/hub-kit": "github:SteppingStoneDevOps/steppingstone-hub-kit#v0.1.0"`

@@ -4,6 +4,7 @@ export * from "./cn";
 export * from "./services";
 export * from "./courses";
 export * from "./departments";
+export * from "./theme";
 export * from "./ThemeProvider";
 export * from "./AppearanceCard";
 export * from "./Logo";

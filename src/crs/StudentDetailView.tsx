@@ -13,13 +13,13 @@ import type { RaiseHandSlot } from "../support";
  * NEVER shows the numeric readiness score (readiness is a distribution). Restyled to Hub tokens. */
 
 const STATUS: Record<Status, { text: string; chip: string; soft: string }> = {
-  "On Track": { text: "text-green", chip: "bg-green/12 text-green border-green/40", soft: "bg-green/8 border-green/30" },
-  "At Risk": { text: "text-yellow", chip: "bg-yellow/12 text-yellow border-yellow/40", soft: "bg-yellow/8 border-yellow/30" },
-  "High Priority": { text: "text-red", chip: "bg-red/12 text-red border-red/40", soft: "bg-red/8 border-red/30" },
+  "On Track": { text: tintText.green, chip: `bg-green/12 ${tintText.green} border-green/40`, soft: "bg-green/8 border-green/30" },
+  "At Risk": { text: tintText.yellow, chip: `bg-yellow/12 ${tintText.yellow} border-yellow/40`, soft: "bg-yellow/8 border-yellow/30" },
+  "High Priority": { text: tintText.red, chip: `bg-red/12 ${tintText.red} border-red/40`, soft: "bg-red/8 border-red/30" },
 };
 const MOMENTUM: Record<string, { t: string; c: string; sub: string }> = {
-  up: { t: "↑ Improving", c: "text-green", sub: "Up in last 30 days" },
-  down: { t: "↓ Declining", c: "text-red", sub: "Down in last 30 days" },
+  up: { t: "↑ Improving", c: tintText.green, sub: "Up in last 30 days" },
+  down: { t: "↓ Declining", c: tintText.red, sub: "Down in last 30 days" },
   stable: { t: "→ Stable", c: "text-muted", sub: "Steady in last 30 days" },
 };
 const ORDINAL: Record<number, string> = { 1: "1st", 2: "2nd", 3: "3rd", 4: "4th" };
@@ -126,7 +126,7 @@ export function StudentDetailView({ student, askStella, generateOutreachDrafts, 
               {[1, 2, 3, 4].map((stage, idx) => (
                 <div key={stage} className="contents">
                   <div className={`flex size-8 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${
-                    stage < yr ? "border-green bg-green/15 text-green"
+                    stage < yr ? `border-green bg-green/15 ${tintText.green}`
                       : stage === yr ? `${st.text} border-current bg-chip`
                       : "border-border bg-chip text-faint"
                   }`}>
@@ -140,7 +140,7 @@ export function StudentDetailView({ student, askStella, generateOutreachDrafts, 
               {[1, 2, 3, 4].map((stage, idx) => (
                 <div key={stage} className="contents">
                   <div className="flex flex-col items-center">
-                    <div className={`text-xs font-medium ${stage < yr ? "text-green" : stage === yr ? st.text : "text-faint"}`}>{STAGE[stage - 1]}</div>
+                    <div className={`text-xs font-medium ${stage < yr ? tintText.green : stage === yr ? st.text : "text-faint"}`}>{STAGE[stage - 1]}</div>
                     <div className="text-[11px] text-muted">Year {stage}</div>
                   </div>
                   {idx < 3 && <div className="flex-1" />}

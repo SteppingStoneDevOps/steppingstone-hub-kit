@@ -2,8 +2,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach } from "vitest";
-import { useState } from "react";
-import { Modal } from "../src/Modal";
+import { useRef, useState } from "react";
+import { Modal, useFocusTrap } from "../src/Modal";
 import { Input } from "../src/form";
 
 afterEach(cleanup);
@@ -133,5 +133,74 @@ describe("Modal focus", () => {
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(document.activeElement).toBe(opener);
+  });
+});
+
+/*
+ * Focus recovery (v0.23.0): Chromium blurs a focused submit button when it turns disabled
+ * ("Saving…") and focus lands on <body>, so the next Tab leaves the dialog. The trap re-homes it
+ * on the panel on the next frame, and leaves a deliberate move to another element alone.
+ */
+describe("Modal focus recovery", () => {
+  const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r, 0)));
+
+  function SaveHarness() {
+    const [open, setOpen] = useState(true);
+    const [pending, setPending] = useState(false);
+    return (
+      <>
+        <button>Outside</button>
+        <Modal open={open} onClose={() => setOpen(false)} title="Save thing">
+          <button disabled={pending} onClick={() => setPending(true)}>
+            {pending ? "Saving…" : "Save"}
+          </button>
+        </Modal>
+      </>
+    );
+  }
+
+  it("moves focus to the panel when the focused control is disabled and focus falls to <body>", async () => {
+    render(<SaveHarness />);
+    const save = screen.getByText("Save");
+    save.focus();
+    // What Chromium does when the focused button becomes disabled: blur with no relatedTarget,
+    // leaving focus on <body>. jsdom keeps focus on a disabled button, so the blur is explicit.
+    save.blur();
+    fireEvent.click(save);
+    expect(document.activeElement).toBe(document.body);
+    await nextFrame();
+    expect(document.activeElement).toBe(screen.getByRole("dialog"));
+  });
+
+  it("does not override a move to another element", async () => {
+    render(<SaveHarness />);
+    screen.getByText("Save").focus();
+    const outside = screen.getByText("Outside");
+    outside.focus();
+    await nextFrame();
+    expect(document.activeElement).toBe(outside);
+  });
+
+  it("gives a panel without a tabindex one, so it can take the focus", () => {
+    function Bare() {
+      const ref = useRef<HTMLDivElement>(null);
+      useFocusTrap(true, ref);
+      return <div ref={ref} role="dialog" aria-label="Bare" />;
+    }
+    render(<Bare />);
+    const panel = screen.getByRole("dialog");
+    expect(panel.getAttribute("tabindex")).toBe("-1");
+    expect(document.activeElement).toBe(panel);
+  });
+
+  it("stops recovering once the dialog closes", async () => {
+    render(<SaveHarness />);
+    const save = screen.getByText("Save");
+    save.focus();
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    (document.activeElement as HTMLElement | null)?.blur();
+    await nextFrame();
+    expect(document.activeElement).toBe(document.body);
   });
 });

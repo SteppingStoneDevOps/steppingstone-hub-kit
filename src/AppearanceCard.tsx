@@ -1,7 +1,8 @@
 "use client";
 
 import { Card } from "./Card";
-import { useTheme, type ThemeChoice } from "./ThemeProvider";
+import { useTheme } from "./ThemeProvider";
+import type { ThemeChoice } from "./theme";
 import { cn } from "./cn";
 
 const OPTIONS: { value: ThemeChoice; label: string }[] = [

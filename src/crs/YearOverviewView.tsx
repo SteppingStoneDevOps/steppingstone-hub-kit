@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import { Card } from "../Card";
+import { tintText } from "../Badge";
 import { stageLabel, STAGE_DESC } from "./constants";
 import type { CohortSummary, Status } from "./types";
 import type { RaiseHandSlot } from "../support";
@@ -11,9 +12,9 @@ import type { RaiseHandSlot } from "../support";
  * Derived from the live cohort distribution — no fabricated per-year metrics or trends.
  */
 const STATUS_ROWS: { status: Status; cls: string; bar: string; desc: (stage: string) => string }[] = [
-  { status: "On Track", cls: "text-green", bar: "bg-green", desc: (s) => `Progressing well through the ${s} stage.` },
-  { status: "At Risk", cls: "text-yellow", bar: "bg-yellow", desc: () => "Engaged but showing gaps against key milestones." },
-  { status: "High Priority", cls: "text-red", bar: "bg-red", desc: () => "Key milestones unmet — needs immediate outreach." },
+  { status: "On Track", cls: tintText.green, bar: "bg-green", desc: (s) => `Progressing well through the ${s} stage.` },
+  { status: "At Risk", cls: tintText.yellow, bar: "bg-yellow", desc: () => "Engaged but showing gaps against key milestones." },
+  { status: "High Priority", cls: tintText.red, bar: "bg-red", desc: () => "Key milestones unmet — needs immediate outreach." },
 ];
 
 export function YearOverviewView({ cohort, basePath, raiseHand }: { cohort: CohortSummary; basePath: string; raiseHand?: RaiseHandSlot }) {

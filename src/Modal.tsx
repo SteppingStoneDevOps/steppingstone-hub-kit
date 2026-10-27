@@ -13,7 +13,14 @@ const FOCUSABLE =
  * `autoFocus` keeps the focus it took); Tab and Shift+Tab cycle inside the panel; on close,
  * focus returns to whatever had it before the dialog opened.
  * Shared by Modal and the CRS overlays (AskStella, OutreachBuilder, SendEmail), which render
- * their own panels; give the panel `tabIndex={-1}` so it can take focus itself.
+ * their own panels; give the panel `tabIndex={-1}` so it can take focus itself (the hook sets it
+ * when the panel has no tabindex).
+ *
+ * Focus recovery (v0.23.0): when the focused control inside the panel is disabled or removed (a
+ * submit button turning into "Saving…"), Chromium drops focus to <body> and the next Tab leaves
+ * the dialog. A `focusout` with no `relatedTarget`, or a `disabled`/child change in the panel,
+ * schedules a check on the next animation frame: if the dialog is still open and focus is on
+ * <body> (or nowhere), the panel takes it. A move to a real element is never overridden.
  */
 export function useFocusTrap(open: boolean, panelRef: React.RefObject<HTMLDivElement | null>) {
   // The opener is captured during the first render in which `open` is true, not in the effect:
@@ -32,6 +39,7 @@ export function useFocusTrap(open: boolean, panelRef: React.RefObject<HTMLDivEle
     const panel = panelRef.current;
     if (!open || !panel) return;
     const previous = opener.current;
+    if (!panel.hasAttribute("tabindex")) panel.tabIndex = -1;
     const focusables = () => Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE));
     // A child that took focus with `autoFocus` wins; otherwise the first focusable, or the panel.
     const already = document.activeElement;
@@ -59,8 +67,33 @@ export function useFocusTrap(open: boolean, panelRef: React.RefObject<HTMLDivEle
         first.focus();
       }
     };
+    // Focus recovery: re-home focus that fell to <body> while the dialog is open.
+    let active = true;
+    let frame = 0;
+    const recover = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const now = document.activeElement;
+        if (active && (now === null || now === document.body)) panel.focus();
+      });
+    };
+    const onFocusOut = (e: FocusEvent) => {
+      if (e.relatedTarget === null) recover();
+    };
+    // Not every engine fires focusout when a focused control is disabled or removed.
+    const observer =
+      typeof MutationObserver === "undefined"
+        ? null
+        : new MutationObserver(recover);
+    observer?.observe(panel, { subtree: true, childList: true, attributes: true, attributeFilter: ["disabled"] });
+
     document.addEventListener("keydown", onKey);
+    panel.addEventListener("focusout", onFocusOut);
     return () => {
+      active = false;
+      cancelAnimationFrame(frame);
+      observer?.disconnect();
+      panel.removeEventListener("focusout", onFocusOut);
       document.removeEventListener("keydown", onKey);
       if (previous instanceof HTMLElement) previous.focus();
     };

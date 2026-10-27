@@ -16,9 +16,9 @@ import type { Archetype } from "./types";
  */
 const TONE: Record<ArchetypeTone, string> = {
   danger: `${tintText.red} border-red/40 bg-red/12`,
-  warn: "text-yellow border-yellow/40 bg-yellow/12",
+  warn: `${tintText.yellow} border-yellow/40 bg-yellow/12`,
   info: `${tintText.indigo} border-indigo/40 bg-indigo/12`,
-  good: "text-green border-green/40 bg-green/12",
+  good: `${tintText.green} border-green/40 bg-green/12`,
   neutral: "text-muted border-border bg-chip",
 };
 
